@@ -2,6 +2,7 @@ package capitalhumano.controladores;
 
 import capitalhumano.adapters.FabricaCuestionarios;
 import capitalhumano.dominio.Candidato;
+import capitalhumano.dominio.Cuestionario;
 import capitalhumano.dominio.Evaluacion;
 import capitalhumano.dominio.Puesto;
 import capitalhumano.dtos.ClaveCandidatoDTO;
@@ -13,6 +14,7 @@ import capitalhumano.persistencia.EvaluacionDAO;
 import capitalhumano.persistencia.PreguntaDAO;
 import capitalhumano.persistencia.PuestoDAO;
 import capitalhumano.servicios.ServicioExportacionClaves;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GestorEvaluacionCandidatos {
@@ -41,11 +43,21 @@ public class GestorEvaluacionCandidatos {
     }
 
     public List<Candidato> buscarCandidatos(String apellido, String nombre, int nroCandidato) {
-        throw new UnsupportedOperationException("TODO #10");
+        return candidatoDAO.buscarPorFiltros(apellido, nombre, nroCandidato);
     }
 
     public List<Candidato> validarCandidatos(List<Candidato> candidatos) {
-        throw new UnsupportedOperationException("TODO #10");
+        List<Candidato> candidatosNoHabilitados = new ArrayList<>();
+        if (candidatos == null) {
+            return candidatosNoHabilitados;
+        }
+        for (Candidato candidato : candidatos) {
+            List<Cuestionario> vigentes = evaluacionDAO.obtenerCuestionariosActivosOEnProceso(candidato);
+            if (vigentes != null && !vigentes.isEmpty()) {
+                candidatosNoHabilitados.add(candidato);
+            }
+        }
+        return candidatosNoHabilitados;
     }
 
     public List<Puesto> listarPuestos() {
