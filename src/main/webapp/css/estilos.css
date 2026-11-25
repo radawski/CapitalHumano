@@ -1,0 +1,108 @@
+/* Estilos base tomados de los mockups de la Entrega 1 (cabecera azul, paneles grises con borde azul,
+   botones azules con texto blanco). */
+:root {
+    --azul: #1b365d;
+    --azul-claro: #2a4d80;
+    --gris-panel: #dcdcdc;
+    --gris-texto: #555;
+    --rojo: #e00000;
+    --blanco: #fff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    color: #1f1f1f;
+    background: var(--blanco);
+}
+
+/* Cabecera */
+.cabecera {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 12px 24px;
+    background: var(--azul);
+    color: var(--blanco);
+}
+.cabecera__marca { display: flex; flex-direction: column; }
+.cabecera__consultora { font-size: 0.8rem; color: #9aa7b8; }
+.cabecera__nombre { color: var(--blanco); font-weight: 600; text-decoration: none; }
+.cabecera__titulo { margin: 0; font-size: 2.4rem; font-weight: 600; text-align: center; }
+.cabecera__usuario { justify-self: end; font-weight: 600; }
+
+/* Menú */
+.menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    padding: 8px 24px;
+    background: #eef1f5;
+    border-bottom: 1px solid #cfd6df;
+}
+.menu a { color: var(--azul); text-decoration: none; font-weight: 500; }
+.menu a:hover { text-decoration: underline; }
+
+.contenido { max-width: 1200px; margin: 32px auto; padding: 0 24px; }
+
+/* Paneles */
+.panel {
+    background: var(--gris-panel);
+    border-left: 5px solid var(--azul);
+    border-radius: 6px;
+    padding: 24px 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+.panel__subtitulo { margin: 0; font-size: 0.85rem; color: var(--gris-texto); }
+.panel__titulo { margin: 0 0 12px; font-size: 1.1rem; }
+
+/* Botones */
+.boton {
+    display: inline-block;
+    padding: 6px 20px;
+    border: none;
+    border-radius: 4px;
+    background: var(--azul);
+    color: var(--blanco);
+    font-size: 1.1rem;
+    text-decoration: none;
+    cursor: pointer;
+}
+.boton:hover { background: var(--azul-claro); }
+.boton[disabled], .boton--deshabilitado { opacity: 0.5; cursor: not-allowed; }
+
+/* Formularios */
+label { display: block; margin-bottom: 4px; }
+input[type="text"], input[type="password"], select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: var(--blanco);
+    font-size: 1rem;
+}
+.error { color: var(--rojo); }
+.campo--error input, .campo--error select { border-color: var(--rojo); }
+
+/* Tablas */
+table { width: 100%; border-collapse: collapse; background: var(--blanco); }
+th, td { padding: 8px 12px; border-bottom: 1px solid #ddd; text-align: left; }
+th { background: var(--azul); color: var(--blanco); font-weight: 600; }
+
+/* Menú principal */
+.menu-principal { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.menu-principal a { color: var(--azul); font-weight: 600; }
+.menu-principal .fuera-de-alcance { color: #888; }
+
+.pie { text-align: center; padding: 16px; color: #888; font-size: 0.8rem; }
+
+/* Impresión: solo el contenido (lo usa CU028, #7) */
+@media print {
+    .menu, .pie, .no-imprimir, .boton { display: none !important; }
+    .cabecera { background: none; color: #000; }
+    .cabecera__nombre { color: #000; }
+    .panel { box-shadow: none; }
+}

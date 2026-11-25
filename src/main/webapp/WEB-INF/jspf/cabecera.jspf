@@ -1,0 +1,32 @@
+<%-- Plantilla base: cabecera con el nombre de la consultora, el título de la pantalla y el usuario actual.
+     Cada JSP define el título con <c:set var="titulo" value="..."/> (o el servlet con request.setAttribute)
+     antes de incluir este fragmento. --%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><c:out value="${titulo}"/> - Capit@l Humano</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilos.css">
+</head>
+<body>
+<header class="cabecera">
+    <div class="cabecera__marca">
+        <span class="cabecera__consultora">Consultora</span>
+        <a class="cabecera__nombre" href="${pageContext.request.contextPath}/">Capit@l Humano</a>
+    </div>
+    <h1 class="cabecera__titulo"><c:out value="${titulo}"/></h1>
+    <div class="cabecera__usuario">
+        <span class="cabecera__icono" aria-hidden="true">&#128100;</span>
+        Usuario: <c:out value="${empty sessionScope.usuario ? '[sin sesión]' : sessionScope.usuario}"/>
+    </div>
+</header>
+<nav class="menu">
+    <a href="${pageContext.request.contextPath}/">Menú principal</a>
+    <a href="${pageContext.request.contextPath}/preguntas">CU020 Gestionar preguntas</a>
+    <a href="${pageContext.request.contextPath}/evaluar-candidatos">CU025 Evaluar candidatos</a>
+    <a href="${pageContext.request.contextPath}/orden-merito">CU028 Orden de mérito</a>
+    <a href="${pageContext.request.contextPath}/login">CU001 Ingresar</a>
+</nav>
+<main class="contenido">
