@@ -8,6 +8,6 @@ import capitalhumano.dominio.Cuestionario;
 public class FabricaCuestionarios {
 
     public Cuestionario crearCuestionario(Candidato candidato, ConfiguracionCuestionario configuracion) {
-        throw new UnsupportedOperationException("TODO #12");
+        return new CuestionarioBuilder().conCandidato(candidato).conConfiguracion(configuracion).construir();
     }
 }

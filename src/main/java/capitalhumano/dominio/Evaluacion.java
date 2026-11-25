@@ -22,8 +22,11 @@ public class Evaluacion {
         this.puesto = puesto;
     }
 
-    /** Constructor de reconstrucción (no figura en el diagrama): lo usan los DAO. */
-    public Evaluacion(UUID id, LocalDate fechaCreacion, boolean activa, Puesto puesto, List<Cuestionario> cuestionarios) {
+    /**
+     * Constructor de reconstrucción (no figura en el diagrama): lo usan los DAO.
+     */
+    public Evaluacion(UUID id, LocalDate fechaCreacion, boolean activa, Puesto puesto,
+            List<Cuestionario> cuestionarios) {
         this.id = id;
         this.fechaCreacion = fechaCreacion;
         this.activa = activa;
@@ -35,7 +38,11 @@ public class Evaluacion {
     }
 
     public void agregarCuestionario(Cuestionario cuestionario) {
-        throw new UnsupportedOperationException("TODO #12");
+        if (cuestionario == null) {
+            throw new IllegalArgumentException("El cuestionario no puede ser nulo");
+        }
+        this.cuestionarios.add(cuestionario);
+        cuestionario.setEvaluacion(this);
     }
 
     public UUID getId() {

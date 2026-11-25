@@ -2,6 +2,8 @@ package capitalhumano.controladores;
 
 import capitalhumano.adapters.FabricaCuestionarios;
 import capitalhumano.dominio.Candidato;
+import capitalhumano.dominio.ConfiguracionCuestionario;
+import capitalhumano.dominio.Cuestionario;
 import capitalhumano.dominio.Evaluacion;
 import capitalhumano.dominio.Puesto;
 import capitalhumano.dtos.ClaveCandidatoDTO;
@@ -13,7 +15,10 @@ import capitalhumano.persistencia.EvaluacionDAO;
 import capitalhumano.persistencia.PreguntaDAO;
 import capitalhumano.persistencia.PuestoDAO;
 import capitalhumano.servicios.ServicioExportacionClaves;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class GestorEvaluacionCandidatos {
 
@@ -27,9 +32,9 @@ public class GestorEvaluacionCandidatos {
     private FabricaCuestionarios fabricaCuestionarios;
 
     public GestorEvaluacionCandidatos(CandidatoDAO candidatoDAO, PuestoDAO puestoDAO, EvaluacionDAO evaluacionDAO,
-                                      ConfiguracionDAO configuracionDAO, CompetenciaDAO competenciaDAO,
-                                      PreguntaDAO preguntaDAO, ServicioExportacionClaves servicioExportacionClaves,
-                                      FabricaCuestionarios fabricaCuestionarios) {
+            ConfiguracionDAO configuracionDAO, CompetenciaDAO competenciaDAO,
+            PreguntaDAO preguntaDAO, ServicioExportacionClaves servicioExportacionClaves,
+            FabricaCuestionarios fabricaCuestionarios) {
         this.candidatoDAO = candidatoDAO;
         this.puestoDAO = puestoDAO;
         this.evaluacionDAO = evaluacionDAO;
@@ -57,15 +62,47 @@ public class GestorEvaluacionCandidatos {
     }
 
     public Evaluacion generarEvaluacion(List<Candidato> candidatos, Puesto puesto) {
-        throw new UnsupportedOperationException("TODO #12");
+        if (candidatos == null || candidatos.isEmpty()) {
+            throw new IllegalArgumentException("Debe seleccionar al menos un candidato para generar la evaluación");
+        }
+        if (puesto == null) {
+            throw new IllegalArgumentException("Debe seleccionar un puesto para generar la evaluación");
+        }
+
+        ConfiguracionCuestionario config = configuracionDAO.obtenerConfiguracion();
+        Evaluacion evaluacion = new Evaluacion(puesto);
+        Set<String> clavesUsadas = new HashSet<>();
+
+        for (Candidato candidato : candidatos) {
+            Cuestionario cuestionario = fabricaCuestionarios.crearCuestionario(candidato, config);
+            while (!clavesUsadas.add(cuestionario.getClave())) {
+                cuestionario.generarClave();
+            }
+            evaluacion.agregarCuestionario(cuestionario);
+        }
+
+        return evaluacion;
     }
 
     public List<ClaveCandidatoDTO> obtenerClavesCandidatos(Evaluacion evaluacion) {
-        throw new UnsupportedOperationException("TODO #12");
+        if (evaluacion == null) {
+            throw new IllegalArgumentException("La evaluación no puede ser nula");
+        }
+        List<Cuestionario> cuestionarioList = evaluacion.getCuestionarios();
+        List<ClaveCandidatoDTO> claveCandidatoDTOList = new ArrayList<>();
+
+        for (Cuestionario cuestionario : cuestionarioList) {
+            claveCandidatoDTOList.add(new ClaveCandidatoDTO(cuestionario.getCandidato(), cuestionario.getClave()));
+        }
+
+        return claveCandidatoDTOList;
     }
 
     public void guardarEvaluacion(Evaluacion evaluacion) {
-        throw new UnsupportedOperationException("TODO #12");
+        if (evaluacion == null) {
+            throw new IllegalArgumentException("La evaluación no puede ser nula");
+        }
+        evaluacionDAO.crearEvaluacion(evaluacion);
     }
 
     public void exportarClaves(Evaluacion evaluacion, String carpeta) {
