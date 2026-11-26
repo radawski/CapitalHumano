@@ -117,6 +117,11 @@
                                             </button>
                                             <c:url var="urlEliminar" value="/preguntas/eliminar">
                                                 <c:param name="id" value="${preg.id}"/>
+                                                <c:param name="buscar" value="1"/>
+                                                <c:param name="competencia" value="${competenciaSeleccionada}"/>
+                                                <c:param name="factor" value="${factorSeleccionado}"/>
+                                                <c:param name="nombre" value="${nombrePregunta}"/>
+                                                <c:param name="pagina" value="${paginaActual}"/>
                                             </c:url>
                                             <a class="boton-icono boton-icono--eliminar"
                                                href="${urlEliminar}"
@@ -190,6 +195,61 @@
             <a class="boton" href="${pageContext.request.contextPath}/">Salir</a>
         </div>
 
+        <%-- CU023 - Paso 1 a 2: Modal de confirmación de baja --%>
+        <c:if test="${not empty preguntaAEliminar}">
+            <div class="modal-fondo" role="dialog" aria-modal="true" aria-labelledby="titulo-confirmar-baja">
+                <div class="modal-caja modal-caja--cu023">
+                    <h2 id="titulo-confirmar-baja" class="cu023-modal__titulo">Eliminar pregunta</h2>
+                    <p class="cu023-modal__mensaje">
+                        Los datos de la Pregunta
+                        <strong><c:out value="${preguntaAEliminar.nombre}"/></strong>
+                        serán eliminados del sistema
+                    </p>
+                    <form method="post" action="${pageContext.request.contextPath}/preguntas/eliminar" class="cu023-modal__acciones">
+                        <input type="hidden" name="id" value="<c:out value='${preguntaAEliminar.id}'/>">
+                        <input type="hidden" name="nombrePregunta" value="<c:out value='${preguntaAEliminar.nombre}'/>">
+                        <c:if test="${busquedaRealizada}">
+                            <input type="hidden" name="buscar" value="1">
+                            <input type="hidden" name="competencia" value="<c:out value='${competenciaSeleccionada}'/>">
+                            <input type="hidden" name="factor" value="<c:out value='${factorSeleccionado}'/>">
+                            <input type="hidden" name="nombre" value="<c:out value='${nombrePregunta}'/>">
+                            <input type="hidden" name="pagina" value="<c:out value='${paginaActual}'/>">
+                        </c:if>
+
+                        <c:url var="urlCancelarBaja" value="/preguntas">
+                            <c:if test="${busquedaRealizada}">
+                                <c:param name="buscar" value="1"/>
+                                <c:param name="competencia" value="${competenciaSeleccionada}"/>
+                                <c:param name="factor" value="${factorSeleccionado}"/>
+                                <c:param name="nombre" value="${nombrePregunta}"/>
+                                <c:param name="pagina" value="${paginaActual}"/>
+                            </c:if>
+                        </c:url>
+                        <a class="boton boton--secundario" href="${urlCancelarBaja}" tabindex="1">CANCELAR</a>
+                        <button type="submit" class="boton" tabindex="2">ELIMINAR</button>
+                    </form>
+                </div>
+            </div>
+        </c:if>
+
+        <%-- CU023 - Paso 3 a 5: Modal de éxito --%>
+        <c:if test="${not empty preguntaEliminada}">
+            <div class="modal-fondo" id="modal-exito-baja" role="dialog" aria-modal="true" aria-labelledby="titulo-exito-baja">
+                <div class="modal-caja modal-caja--cu023">
+                    <h2 id="titulo-exito-baja" class="cu023-modal__titulo">Eliminar pregunta</h2>
+                    <p class="cu023-modal__mensaje">
+                        Los datos de la Pregunta
+                        <strong><c:out value="${preguntaEliminada}"/></strong>
+                        han sido eliminados del sistema
+                    </p>
+                    <p class="cu023-modal__nota">Presione cualquier tecla o Aceptar para continuar.</p>
+                    <div class="cu023-modal__acciones cu023-modal__acciones--centro">
+                        <button type="button" class="boton" id="btn-cerrar-exito-baja">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        </c:if>
+
         <script>
             (function () {
                 const inputNombre = document.getElementById('nombre');
@@ -230,6 +290,25 @@
                             // Si falla el fetch, el combo queda en "Todos" sin bloquear la búsqueda
                         }
                     });
+                }
+
+                const modalExito = document.getElementById('modal-exito-baja');
+                if (modalExito) {
+                    const cerrarModalExito = function () {
+                        modalExito.remove();
+                        document.removeEventListener('keydown', cerrarModalExito);
+                    };
+                    const btnAceptar = document.getElementById('btn-cerrar-exito-baja');
+                    if (btnAceptar) {
+                        btnAceptar.addEventListener('click', cerrarModalExito);
+                        btnAceptar.focus();
+                    }
+                    modalExito.addEventListener('click', function (ev) {
+                        if (ev.target === modalExito) {
+                            cerrarModalExito();
+                        }
+                    });
+                    document.addEventListener('keydown', cerrarModalExito);
                 }
             })();
         </script>

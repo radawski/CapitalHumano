@@ -15,6 +15,9 @@ public class RegistradorAuditoria implements ObservadorAuditoria {
 
     @Override
     public void actualizar(RegistroAuditoria registro) {
-        throw new UnsupportedOperationException("TODO #4");
+        if (registro == null) {
+            throw new IllegalArgumentException("El registro de auditoría no puede ser nulo");
+        }
+        auditoriaDAO.registrar(registro);
     }
 }

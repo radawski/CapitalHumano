@@ -1,6 +1,7 @@
 package capitalhumano.dominio;
 
 import capitalhumano.enumeraciones.TipoPregunta;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -74,7 +75,14 @@ public class Pregunta extends SujetoAuditable {
 
     @Override
     public void darDeBaja(String usuario) {
-        throw new UnsupportedOperationException("TODO #4");
+        this.activa = false;
+        notificarObservadores(construirRegistro(usuario, "BAJA_LOGICA"));
+    }
+
+    @Override
+    protected RegistroAuditoria construirRegistro(String usuario, String operacion) {
+        return new RegistroAuditoria(usuario, LocalDateTime.now(), operacion, "Pregunta",
+                id != null ? id.toString() : "");
     }
 
     @Override
