@@ -26,8 +26,11 @@
                 </p>
                 <p class="orden-merito__emision">Emitido el <c:out value="${orden.fechaEmision.format(formatoFechaHora)}"/></p>
             </div>
+            <%-- Pasos 8–10: Imprimir abre el diálogo del navegador (impresora de la PC del consultor,
+                 según el diagrama de despliegue); Volver regresa a la búsqueda. --%>
             <div class="acciones-barra no-imprimir">
                 <a class="boton boton--secundario" href="${pageContext.request.contextPath}/orden-merito">Volver</a>
+                <button class="boton" type="button" onclick="window.print()">Imprimir</button>
             </div>
         </div>
 
