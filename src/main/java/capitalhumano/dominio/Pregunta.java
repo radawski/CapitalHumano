@@ -2,6 +2,7 @@ package capitalhumano.dominio;
 
 import capitalhumano.enumeraciones.TipoPregunta;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -23,7 +24,14 @@ public class Pregunta extends SujetoAuditable {
     private Map<ValorOpcion, PreguntaValorOpcion> ponderaciones = new LinkedHashMap<>();
 
     public Pregunta(String nombre, String enunciado, String descripcion, Factor factor, OpcionDeRespuesta opcion) {
-        throw new UnsupportedOperationException("TODO #8");
+        this.id = UUID.randomUUID();
+        this.nombre = nombre;
+        this.enunciado = enunciado;
+        this.descripcion = descripcion != null ? descripcion : "";
+        this.tipoPregunta = TipoPregunta.SINGLE_CHOICE;
+        this.activa = true;
+        this.factor = factor;
+        this.opcion = opcion;
     }
 
     /** Constructor de reconstrucción (no figura en el diagrama): lo usan los DAO. */
@@ -42,7 +50,10 @@ public class Pregunta extends SujetoAuditable {
     }
 
     public void agregarPonderacion(ValorOpcion valor, double ponderacion) {
-        throw new UnsupportedOperationException("TODO #8");
+        if (valor == null) {
+            throw new IllegalArgumentException("El valor de opción no puede ser nulo");
+        }
+        this.ponderaciones.put(valor, new PreguntaValorOpcion(this, valor, ponderacion));
     }
 
     public UUID getId() {
@@ -55,6 +66,18 @@ public class Pregunta extends SujetoAuditable {
 
     public String getEnunciado() {
         return enunciado;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public TipoPregunta getTipoPregunta() {
+        return tipoPregunta;
+    }
+
+    public Map<ValorOpcion, PreguntaValorOpcion> getPonderaciones() {
+        return Collections.unmodifiableMap(ponderaciones);
     }
 
     public Factor getFactor() {

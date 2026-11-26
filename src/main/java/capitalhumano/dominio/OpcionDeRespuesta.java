@@ -22,6 +22,10 @@ public class OpcionDeRespuesta extends SujetoAuditable {
         this.valores = new ArrayList<>(valores);
     }
 
+    public String getCodigo() {
+        return codigo;
+    }
+
     public String getNombre() {
         return nombre;
     }

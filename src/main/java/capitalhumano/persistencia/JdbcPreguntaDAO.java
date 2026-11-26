@@ -4,6 +4,7 @@ import capitalhumano.dominio.Competencia;
 import capitalhumano.dominio.Factor;
 import capitalhumano.dominio.OpcionDeRespuesta;
 import capitalhumano.dominio.Pregunta;
+import capitalhumano.dominio.PreguntaValorOpcion;
 import capitalhumano.dominio.ValorOpcion;
 import capitalhumano.enumeraciones.TipoCompetencia;
 import capitalhumano.enumeraciones.TipoPregunta;
@@ -28,7 +29,68 @@ public class JdbcPreguntaDAO implements PreguntaDAO {
 
     @Override
     public void guardar(Pregunta pregunta) {
-        throw new UnsupportedOperationException("TODO #8");
+        if (pregunta == null) {
+            throw new IllegalArgumentException("La pregunta no puede ser nula");
+        }
+        if (pregunta.getFactor() == null || pregunta.getFactor().getCodigo() == null) {
+            throw new IllegalArgumentException("La pregunta debe pertenecer a un factor");
+        }
+        if (pregunta.getOpcion() == null || pregunta.getOpcion().getCodigo() == null) {
+            throw new IllegalArgumentException("La pregunta debe tener una opción de respuesta");
+        }
+
+        String sqlPregunta = """
+                INSERT INTO pregunta (
+                    cod_pregunta, cod_factor, cod_opcion, nombre, enunciado, descripcion, tipo_pregunta, activa
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, TRUE)
+                """;
+        String sqlPonderacion = """
+                INSERT INTO pregunta_valor_opcion (cod_pregunta, id_valor_opcion, ponderacion)
+                VALUES (?, ?, ?)
+                """;
+
+        try (Connection conn = conexionBD.getConexion()) {
+            boolean autoCommitOriginal = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement psPreg = conn.prepareStatement(sqlPregunta)) {
+                    psPreg.setObject(1, pregunta.getId());
+                    psPreg.setString(2, pregunta.getFactor().getCodigo());
+                    psPreg.setString(3, pregunta.getOpcion().getCodigo());
+                    psPreg.setString(4, pregunta.getNombre());
+                    psPreg.setString(5, pregunta.getEnunciado());
+                    psPreg.setString(6, pregunta.getDescripcion() != null ? pregunta.getDescripcion() : "");
+                    TipoPregunta tipo = pregunta.getTipoPregunta() != null
+                            ? pregunta.getTipoPregunta()
+                            : TipoPregunta.SINGLE_CHOICE;
+                    psPreg.setString(7, tipo.name());
+                    psPreg.executeUpdate();
+                }
+
+                try (PreparedStatement psPond = conn.prepareStatement(sqlPonderacion)) {
+                    for (Map.Entry<ValorOpcion, PreguntaValorOpcion> entry : pregunta.getPonderaciones().entrySet()) {
+                        psPond.setObject(1, pregunta.getId());
+                        psPond.setObject(2, entry.getKey().getId());
+                        psPond.setDouble(3, entry.getValue().getPonderacion());
+                        psPond.addBatch();
+                    }
+                    psPond.executeBatch();
+                }
+
+                conn.commit();
+            } catch (SQLException | RuntimeException e) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    e.addSuppressed(rollbackEx);
+                }
+                throw e;
+            } finally {
+                conn.setAutoCommit(autoCommitOriginal);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al guardar la pregunta en la base de datos", e);
+        }
     }
 
     @Override
@@ -138,12 +200,38 @@ public class JdbcPreguntaDAO implements PreguntaDAO {
 
     @Override
     public boolean existePorNombre(Factor factor, String nombre) {
-        throw new UnsupportedOperationException("TODO #8");
+        if (factor == null || factor.getCodigo() == null || nombre == null || nombre.isBlank()) {
+            return false;
+        }
+        String sql = "SELECT 1 FROM pregunta WHERE cod_factor = ? AND UPPER(nombre) = UPPER(?) AND activa = TRUE LIMIT 1";
+        try (Connection conn = conexionBD.getConexion();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, factor.getCodigo());
+            ps.setString(2, nombre.trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al verificar existencia de pregunta por nombre", e);
+        }
     }
 
     @Override
     public boolean existePorEnunciado(Factor factor, String enunciado) {
-        throw new UnsupportedOperationException("TODO #8");
+        if (factor == null || factor.getCodigo() == null || enunciado == null || enunciado.isBlank()) {
+            return false;
+        }
+        String sql = "SELECT 1 FROM pregunta WHERE cod_factor = ? AND UPPER(enunciado) = UPPER(?) AND activa = TRUE LIMIT 1";
+        try (Connection conn = conexionBD.getConexion();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, factor.getCodigo());
+            ps.setString(2, enunciado.trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al verificar existencia de pregunta por enunciado", e);
+        }
     }
 
     @Override
@@ -260,6 +348,55 @@ public class JdbcPreguntaDAO implements PreguntaDAO {
 
     @Override
     public List<OpcionDeRespuesta> buscarOpcionesDeRespuesta(String nombre) {
-        throw new UnsupportedOperationException("TODO #8");
+        StringBuilder sqlOpciones = new StringBuilder(
+                "SELECT cod_opcion, nombre, descripcion, activa FROM opcion_de_respuesta WHERE activa = TRUE");
+        boolean tieneNombre = nombre != null && !nombre.isBlank();
+        if (tieneNombre) {
+            sqlOpciones.append(" AND nombre ILIKE ?");
+        }
+        sqlOpciones.append(" ORDER BY nombre");
+
+        String sqlValores = """
+                SELECT id_valor_opcion, orden, descripcion, activo
+                FROM valor_opcion
+                WHERE cod_opcion = ? AND activo = TRUE
+                ORDER BY orden
+                """;
+
+        List<OpcionDeRespuesta> opciones = new ArrayList<>();
+        try (Connection conn = conexionBD.getConexion();
+             PreparedStatement psOp = conn.prepareStatement(sqlOpciones.toString());
+             PreparedStatement psVal = conn.prepareStatement(sqlValores)) {
+            if (tieneNombre) {
+                psOp.setString(1, "%" + nombre.trim() + "%");
+            }
+            try (ResultSet rsOp = psOp.executeQuery()) {
+                while (rsOp.next()) {
+                    String codOpcion = rsOp.getString("cod_opcion");
+                    List<ValorOpcion> valores = new ArrayList<>();
+                    psVal.setString(1, codOpcion);
+                    try (ResultSet rsVal = psVal.executeQuery()) {
+                        while (rsVal.next()) {
+                            valores.add(new ValorOpcion(
+                                    rsVal.getObject("id_valor_opcion", UUID.class),
+                                    rsVal.getInt("orden"),
+                                    rsVal.getString("descripcion"),
+                                    rsVal.getBoolean("activo")
+                            ));
+                        }
+                    }
+                    opciones.add(new OpcionDeRespuesta(
+                            codOpcion,
+                            rsOp.getString("nombre"),
+                            rsOp.getString("descripcion"),
+                            rsOp.getBoolean("activa"),
+                            valores
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al buscar opciones de respuesta", e);
+        }
+        return opciones;
     }
 }
