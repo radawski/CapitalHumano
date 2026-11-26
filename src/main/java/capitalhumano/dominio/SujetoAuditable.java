@@ -1,5 +1,6 @@
 package capitalhumano.dominio;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,22 +10,26 @@ public abstract class SujetoAuditable {
     private List<ObservadorAuditoria> observadores = new ArrayList<>();
 
     public void registrarObservador(ObservadorAuditoria observador) {
-        throw new UnsupportedOperationException("TODO #4");
+        if (observador != null && !observadores.contains(observador)) {
+            observadores.add(observador);
+        }
     }
 
     public void eliminarObservador(ObservadorAuditoria observador) {
-        throw new UnsupportedOperationException("TODO #4");
+        observadores.remove(observador);
     }
 
     public void notificarObservadores(RegistroAuditoria registro) {
-        throw new UnsupportedOperationException("TODO #4");
+        for (ObservadorAuditoria observador : observadores) {
+            observador.actualizar(registro);
+        }
     }
 
     public void darDeBaja(String usuario) {
-        throw new UnsupportedOperationException("TODO #4");
+        notificarObservadores(construirRegistro(usuario, "BAJA_LOGICA"));
     }
 
     protected RegistroAuditoria construirRegistro(String usuario, String operacion) {
-        throw new UnsupportedOperationException("TODO #4");
+        return new RegistroAuditoria(usuario, LocalDateTime.now(), operacion, getClass().getSimpleName(), "");
     }
 }

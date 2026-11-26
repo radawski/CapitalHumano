@@ -1,6 +1,7 @@
 package capitalhumano.pantallas;
 
 import capitalhumano.InicializadorAplicacion;
+import capitalhumano.controladores.GestorBajasCatalogos;
 import capitalhumano.controladores.GestorPreguntas;
 import capitalhumano.dominio.Competencia;
 import capitalhumano.dominio.Factor;
@@ -10,22 +11,31 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 /** {@code <<boundary>>} Gestión de preguntas (CU020: #3, CU023: #4 y CU021 en /preguntas/nueva: #8). */
 @WebServlet(urlPatterns = {"/preguntas", "/preguntas/*"})
 public class PantallaGestionarPreguntas extends HttpServlet {
 
     private static final int TAMANIO_PAGINA = 5;
+    private static final String USUARIO_POR_DEFECTO = "consultor";
+    private static final String ATTR_FLASH_ELIMINADA = "cu023.preguntaEliminada";
+    private static final String ATTR_FLASH_ERROR = "cu023.error";
 
     private GestorPreguntas gestorPreguntas;
+    private GestorBajasCatalogos gestorBajasCatalogos;
 
     @Override
     public void init() {
         gestorPreguntas = InicializadorAplicacion.obtener(getServletContext(), GestorPreguntas.class);
+        gestorBajasCatalogos = InicializadorAplicacion.obtener(getServletContext(), GestorBajasCatalogos.class);
     }
 
     @Override
@@ -41,9 +51,7 @@ public class PantallaGestionarPreguntas extends HttpServlet {
         }
 
         if ("/eliminar".equals(pathInfo)) {
-            request.setAttribute("titulo", "Eliminar pregunta");
-            request.setAttribute("vistaPlaceholder", "CU023 (Baja de pregunta con auditoría) se implementa en el issue #4.");
-            request.getRequestDispatcher("/WEB-INF/jsp/gestionar-preguntas.jsp").forward(request, response);
+            mostrarConfirmacionEliminar(request, response);
             return;
         }
 
@@ -53,6 +61,60 @@ public class PantallaGestionarPreguntas extends HttpServlet {
         }
 
         mostrarPantallaBusqueda(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String pathInfo = request.getPathInfo();
+        if ("/eliminar".equals(pathInfo)) {
+            procesarEliminacion(request, response);
+            return;
+        }
+        response.sendRedirect(request.getContextPath() + "/preguntas");
+    }
+
+    private void mostrarConfirmacionEliminar(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String idTexto = normalizar(request.getParameter("id"));
+        if (idTexto.isEmpty()) {
+            request.setAttribute("error", "Debe indicar el identificador de la pregunta a eliminar.");
+            mostrarPantallaBusqueda(request, response);
+            return;
+        }
+        try {
+            UUID id = UUID.fromString(idTexto);
+            Pregunta encontrada = buscarPreguntaActivaPorId(id);
+            if (encontrada == null) {
+                request.setAttribute("error", "La pregunta seleccionada no existe o ya fue eliminada.");
+            } else {
+                request.setAttribute("preguntaAEliminar", encontrada);
+            }
+        } catch (IllegalArgumentException e) {
+            request.setAttribute("error", "El identificador de la pregunta no es válido.");
+        }
+        mostrarPantallaBusqueda(request, response);
+    }
+
+    private void procesarEliminacion(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        HttpSession session = request.getSession();
+        String idTexto = normalizar(request.getParameter("id"));
+        String nombreFallback = normalizar(request.getParameter("nombrePregunta"));
+
+        try {
+            UUID id = UUID.fromString(idTexto);
+            Pregunta pregunta = buscarPreguntaActivaPorId(id);
+            String nombreMostrar = pregunta != null ? pregunta.getNombre() : nombreFallback;
+            String usuario = obtenerUsuarioActual(session);
+
+            gestorBajasCatalogos.darDeBajaPregunta(id, usuario);
+            session.setAttribute(ATTR_FLASH_ELIMINADA, nombreMostrar);
+        } catch (RuntimeException e) {
+            session.setAttribute(ATTR_FLASH_ERROR, e.getMessage());
+        }
+
+        response.sendRedirect(construirUrlRetorno(request));
     }
 
     private void responderFactoresJson(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -85,6 +147,8 @@ public class PantallaGestionarPreguntas extends HttpServlet {
 
     private void mostrarPantallaBusqueda(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        consumirMensajesFlash(request);
+
         List<Competencia> competencias = gestorPreguntas.obtenerCompetencias();
 
         String codCompetencia = normalizar(request.getParameter("competencia"));
@@ -125,6 +189,65 @@ public class PantallaGestionarPreguntas extends HttpServlet {
         request.setAttribute("factorSeleccionado", factorSeleccionado != null ? factorSeleccionado.getCodigo() : "");
         request.setAttribute("nombrePregunta", nombrePregunta);
         request.getRequestDispatcher("/WEB-INF/jsp/gestionar-preguntas.jsp").forward(request, response);
+    }
+
+    private Pregunta buscarPreguntaActivaPorId(UUID id) {
+        for (Pregunta p : gestorPreguntas.buscarPreguntas(null, null, null)) {
+            if (id.equals(p.getId())) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    private static void consumirMensajesFlash(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return;
+        }
+        Object eliminada = session.getAttribute(ATTR_FLASH_ELIMINADA);
+        if (eliminada != null) {
+            request.setAttribute("preguntaEliminada", eliminada.toString());
+            session.removeAttribute(ATTR_FLASH_ELIMINADA);
+        }
+        Object error = session.getAttribute(ATTR_FLASH_ERROR);
+        if (error != null) {
+            request.setAttribute("error", error.toString());
+            session.removeAttribute(ATTR_FLASH_ERROR);
+        }
+    }
+
+    private static String obtenerUsuarioActual(HttpSession session) {
+        if (session != null) {
+            Object usuario = session.getAttribute("usuario");
+            if (usuario != null && !usuario.toString().isBlank()) {
+                return usuario.toString().trim();
+            }
+        }
+        return USUARIO_POR_DEFECTO;
+    }
+
+    private static String construirUrlRetorno(HttpServletRequest request) {
+        StringBuilder url = new StringBuilder(request.getContextPath()).append("/preguntas");
+        boolean buscar = "1".equals(request.getParameter("buscar"));
+        if (!buscar) {
+            return url.toString();
+        }
+        url.append("?buscar=1");
+        agregarParametro(url, "competencia", request.getParameter("competencia"));
+        agregarParametro(url, "factor", request.getParameter("factor"));
+        agregarParametro(url, "nombre", request.getParameter("nombre"));
+        agregarParametro(url, "pagina", request.getParameter("pagina"));
+        return url.toString();
+    }
+
+    private static void agregarParametro(StringBuilder url, String clave, String valor) {
+        if (valor != null && !valor.isBlank()) {
+            url.append('&')
+                    .append(clave)
+                    .append('=')
+                    .append(URLEncoder.encode(valor.trim(), StandardCharsets.UTF_8));
+        }
     }
 
     private boolean validarAlMenosUnCriterio(Competencia competencia, Factor factor, String nombrePregunta) {

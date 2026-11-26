@@ -38,7 +38,21 @@ public class JdbcPreguntaDAO implements PreguntaDAO {
 
     @Override
     public void eliminarLogico(Pregunta pregunta) {
-        throw new UnsupportedOperationException("TODO #4");
+        if (pregunta == null || pregunta.getId() == null) {
+            throw new IllegalArgumentException("La pregunta a eliminar no puede ser nula");
+        }
+        String sql = "UPDATE pregunta SET activa = FALSE WHERE cod_pregunta = ? AND activa = TRUE";
+        try (Connection conn = conexionBD.getConexion();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setObject(1, pregunta.getId());
+            int filas = ps.executeUpdate();
+            if (filas == 0) {
+                throw new IllegalStateException(
+                        "La pregunta no existe o ya se encuentra inactiva: " + pregunta.getId());
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al eliminar lógicamente la pregunta: " + pregunta.getId(), e);
+        }
     }
 
     @Override

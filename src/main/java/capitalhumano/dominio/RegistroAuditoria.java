@@ -34,4 +34,8 @@ public class RegistroAuditoria {
     public String getEntidad() {
         return entidad;
     }
+
+    public String getIdEntidad() {
+        return idEntidad;
+    }
 }
