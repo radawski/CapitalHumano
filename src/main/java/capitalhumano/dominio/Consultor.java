@@ -23,7 +23,11 @@ public class Consultor {
         return nombreUsuario;
     }
 
+    /**
+     * Indica si el consultor puede autenticarse: tiene un nombre de usuario no vacío. La validación
+     * de la contraseña no es del dominio sino del LDAP ({@code AutenticacionConsultorLDAP}).
+     */
     public boolean autenticar() {
-        throw new UnsupportedOperationException("TODO #18");
+        return nombreUsuario != null && !nombreUsuario.isBlank();
     }
 }
