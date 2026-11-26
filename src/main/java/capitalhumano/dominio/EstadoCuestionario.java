@@ -11,22 +11,27 @@ public abstract class EstadoCuestionario {
     public abstract NombreEstadoCuestionario getNombre();
 
     public boolean permitirIngreso() {
-        throw new UnsupportedOperationException("TODO #14");
+        return false;
     }
 
     public void iniciar(Cuestionario cuestionario) {
-        throw new UnsupportedOperationException("TODO #14");
+        transicionInvalida("iniciar");
     }
 
     public void completar(Cuestionario cuestionario) {
-        throw new UnsupportedOperationException("TODO #14");
+        transicionInvalida("completar");
     }
 
     public void marcarIncompleto(Cuestionario cuestionario) {
-        throw new UnsupportedOperationException("TODO #14");
+        transicionInvalida("marcarIncompleto");
     }
 
     public void marcarSinContestar(Cuestionario cuestionario) {
-        throw new UnsupportedOperationException("TODO #14");
+        transicionInvalida("marcarSinContestar");
+    }
+
+    private void transicionInvalida(String operacion) {
+        throw new IllegalStateException(
+                "Transición inválida '" + operacion + "' desde el estado " + getNombre());
     }
 }

@@ -11,16 +11,16 @@ public class EstadoEnProceso extends EstadoCuestionario {
 
     @Override
     public boolean permitirIngreso() {
-        throw new UnsupportedOperationException("TODO #14");
+        return true;
     }
 
     @Override
     public void completar(Cuestionario cuestionario) {
-        throw new UnsupportedOperationException("TODO #14");
+        cuestionario.setEstado(new EstadoCompleto());
     }
 
     @Override
     public void marcarIncompleto(Cuestionario cuestionario) {
-        throw new UnsupportedOperationException("TODO #14");
+        cuestionario.setEstado(new EstadoIncompleto());
     }
 }
