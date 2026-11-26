@@ -5,9 +5,13 @@ import capitalhumano.dtos.BloqueDTO;
 import capitalhumano.dtos.CredencialesLoginDTO;
 import capitalhumano.dtos.IngresoCuestionarioDTO;
 import capitalhumano.dtos.RespuestasBloqueDTO;
+import capitalhumano.enumeraciones.NombreEstadoCuestionario;
+import capitalhumano.enumeraciones.ResultadoIngreso;
 import capitalhumano.persistencia.CompetenciaDAO;
 import capitalhumano.persistencia.EvaluacionDAO;
 import capitalhumano.persistencia.PreguntaDAO;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class GestorCuestionarios {
@@ -27,7 +31,49 @@ public class GestorCuestionarios {
     }
 
     public IngresoCuestionarioDTO ingresarCuestionario(String clave) {
-        throw new UnsupportedOperationException("TODO #14");
+        Cuestionario cuestionario = evaluacionDAO.obtenerCuestionarioPorClave(clave);
+        if (cuestionario == null) {
+            return new IngresoCuestionarioDTO(ResultadoIngreso.RECHAZADO,
+                    "Los datos ingresados no son válidos o no existe un cuestionario para el Candidato");
+        }
+
+        cuestionario.registrarAcceso();
+        NombreEstadoCuestionario estado = cuestionario.getNombreEstado();
+        LocalDateTime ahora = LocalDateTime.now();
+        IngresoCuestionarioDTO ingreso;
+
+        if (cuestionario.superoMaximoAccesos()) {
+            cuestionario.marcarIncompleto();
+            ingreso = new IngresoCuestionarioDTO(ResultadoIngreso.RECHAZADO,
+                    "Ha superado la cantidad máxima de accesos permitidos");
+
+        } else if (estado == NombreEstadoCuestionario.ACTIVO) {
+            if (cuestionario.superoTiempoActivo(ahora)) {
+                cuestionario.marcarSinContestar();
+                ingreso = new IngresoCuestionarioDTO(ResultadoIngreso.RECHAZADO,
+                        "El plazo para iniciar el cuestionario ha vencido");
+            } else {
+                ingreso = new IngresoCuestionarioDTO(ResultadoIngreso.INSTRUCCIONES,
+                        cuestionario.getId(),
+                        cuestionario.getConfiguracion().getInstrucciones());
+            }
+
+        } else if (estado == NombreEstadoCuestionario.EN_PROCESO) {
+            if (cuestionario.superoTiempoMaximo(ahora)) {
+                cuestionario.marcarIncompleto();
+                ingreso = new IngresoCuestionarioDTO(ResultadoIngreso.RECHAZADO,
+                        "Se ha superado el tiempo máximo para completar el cuestionario");
+            } else {
+                ingreso = new IngresoCuestionarioDTO(ResultadoIngreso.CONTINUAR, cuestionario.getId());
+            }
+
+        } else {
+            ingreso = new IngresoCuestionarioDTO(ResultadoIngreso.RECHAZADO,
+                    "No posee un cuestionario disponible para completar");
+        }
+
+        evaluacionDAO.actualizarCuestionario(cuestionario);
+        return ingreso;
     }
 
     public BloqueDTO comenzarCuestionario(UUID cuestionarioId) {

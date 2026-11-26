@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.time.Duration;
 
 public class Cuestionario {
 
@@ -70,6 +71,10 @@ public class Cuestionario {
         this.resultados = new ArrayList<>(resultados);
     }
 
+    public LocalDateTime getFechaHoraCambioEstado() {
+        return fechaHoraCambioEstado;
+    }
+
     public UUID getId() {
         return id;
     }
@@ -120,19 +125,20 @@ public class Cuestionario {
     }
 
     public void registrarAcceso() {
-        throw new UnsupportedOperationException("TODO #14");
+        cantidadAccesos++;
+        ultimoIngreso = LocalDateTime.now();
     }
 
     public boolean superoMaximoAccesos() {
-        throw new UnsupportedOperationException("TODO #14");
+        return cantidadAccesos > configuracion.getMaximoAccesos();
     }
 
     public boolean superoTiempoActivo(LocalDateTime ahora) {
-        throw new UnsupportedOperationException("TODO #14");
+        return Duration.between(fechaCreacion, ahora).compareTo(configuracion.getTiempoMaximoActivo()) > 0;
     }
 
     public boolean superoTiempoMaximo(LocalDateTime ahora) {
-        throw new UnsupportedOperationException("TODO #14");
+        return Duration.between(fechaHoraInicio, ahora).compareTo(configuracion.getTiempoMaximo()) > 0;
     }
 
     public void asignarPreguntas(Map<Factor, List<Pregunta>> preguntasPorFactor) {
@@ -172,23 +178,26 @@ public class Cuestionario {
     }
 
     public void iniciar() {
-        throw new UnsupportedOperationException("TODO #14");
+        estado.iniciar(this);
+        fechaHoraInicio = LocalDateTime.now();
     }
 
     public void completar() {
-        throw new UnsupportedOperationException("TODO #14");
+        estado.completar(this);
+        fechaHoraFin = LocalDateTime.now();
     }
 
     public void marcarIncompleto() {
-        throw new UnsupportedOperationException("TODO #14");
+        estado.marcarIncompleto(this);
     }
 
     public void marcarSinContestar() {
-        throw new UnsupportedOperationException("TODO #14");
+        estado.marcarSinContestar(this);
     }
 
     void setEstado(EstadoCuestionario nuevoEstado) {
         this.estado = nuevoEstado;
+        this.fechaHoraCambioEstado = LocalDateTime.now();
     }
 
     /**
