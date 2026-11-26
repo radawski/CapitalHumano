@@ -11,7 +11,11 @@ public class PuestoResumenDTO {
     private int evaluacionesCompletas;
 
     public PuestoResumenDTO(Puesto puesto, int cantidadCandidatos, int evaluacionesCompletas) {
-        throw new UnsupportedOperationException("TODO #5");
+        this.codigo = puesto.getCodigo();
+        this.nombre = puesto.getNombre();
+        this.empresa = puesto.getEmpresa();
+        this.cantidadCandidatos = cantidadCandidatos;
+        this.evaluacionesCompletas = evaluacionesCompletas;
     }
 
     public String getCodigo() {

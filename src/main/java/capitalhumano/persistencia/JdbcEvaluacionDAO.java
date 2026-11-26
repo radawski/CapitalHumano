@@ -782,14 +782,33 @@ public class JdbcEvaluacionDAO implements EvaluacionDAO {
         throw new UnsupportedOperationException("TODO #6");
     }
 
+    /** CU028 paso 4: candidatos distintos con cuestionario en alguna evaluación del puesto. */
     @Override
     public int contarCandidatosPorPuesto(Puesto puesto) {
-        throw new UnsupportedOperationException("TODO #5");
+        String sql = "SELECT COUNT(DISTINCT c.nro_candidato) FROM cuestionario c "
+                + "JOIN evaluacion e ON e.id_evaluacion = c.id_evaluacion WHERE e.cod_puesto = ?";
+        return contarPorPuesto(sql, puesto, "Error al contar los candidatos del puesto");
     }
 
+    /** CU028 paso 4: cuestionarios en estado COMPLETO de las evaluaciones del puesto. */
     @Override
     public int contarCuestionariosCompletosPorPuesto(Puesto puesto) {
-        throw new UnsupportedOperationException("TODO #5");
+        String sql = "SELECT COUNT(*) FROM cuestionario c "
+                + "JOIN evaluacion e ON e.id_evaluacion = c.id_evaluacion "
+                + "WHERE e.cod_puesto = ? AND c.estado = 'COMPLETO'";
+        return contarPorPuesto(sql, puesto, "Error al contar los cuestionarios completos del puesto");
+    }
+
+    private int contarPorPuesto(String sql, Puesto puesto, String mensajeError) {
+        try (Connection con = conexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, puesto.getCodigo());
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(mensajeError, e);
+        }
     }
 
     @Override
