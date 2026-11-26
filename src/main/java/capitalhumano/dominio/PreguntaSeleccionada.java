@@ -32,11 +32,15 @@ public class PreguntaSeleccionada {
     }
 
     public void responder(ValorOpcion valor) {
-        throw new UnsupportedOperationException("TODO #16");
+        if (valor == null) {
+            throw new IllegalArgumentException("Es obligatorio responder la pregunta");
+        }
+        this.valorElegido = valor;
+        this.fechaHora = LocalDateTime.now();
     }
 
     public boolean estaRespondida() {
-        throw new UnsupportedOperationException("TODO #16");
+        return valorElegido != null;
     }
 
     public ValorOpcion getValorElegido() {
@@ -48,6 +52,9 @@ public class PreguntaSeleccionada {
     }
 
     public double getPonderacionObtenida() {
-        throw new UnsupportedOperationException("TODO #17");
+        if (!estaRespondida()) {
+            throw new IllegalStateException("La pregunta " + orden + " todavía no fue respondida");
+        }
+        return pregunta.getPonderacion(valorElegido);
     }
 }

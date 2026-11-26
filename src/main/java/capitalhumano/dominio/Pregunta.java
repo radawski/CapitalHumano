@@ -88,12 +88,22 @@ public class Pregunta extends SujetoAuditable {
         return opcion;
     }
 
+    /** Devuelve el ValorOpcion de la opción de respuesta de esta pregunta que tiene ese id. */
     public ValorOpcion getValor(UUID valorOpcionId) {
-        throw new UnsupportedOperationException("TODO #16");
+        for (ValorOpcion valor : ponderaciones.keySet()) {
+            if (valor.getId().equals(valorOpcionId)) {
+                return valor;
+            }
+        }
+        throw new IllegalArgumentException("El valor elegido no corresponde a la pregunta " + nombre);
     }
 
     public double getPonderacion(ValorOpcion valor) {
-        throw new UnsupportedOperationException("TODO #17");
+        PreguntaValorOpcion ponderacion = ponderaciones.get(valor);
+        if (ponderacion == null) {
+            throw new IllegalArgumentException("La pregunta " + nombre + " no tiene ponderación para ese valor");
+        }
+        return ponderacion.getPonderacion();
     }
 
     @Override

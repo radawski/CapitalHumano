@@ -23,11 +23,19 @@ public class ResultadoCompetencia {
     }
 
     public void agregarResultadoFactor(Factor factor, float puntaje) {
-        throw new UnsupportedOperationException("TODO #17");
+        resultadosFactor.add(new ResultadoFactor(factor, puntaje));
     }
 
+    /** Observación 3 de CU026: total de la competencia = suma de totales de factores / cantidad de factores evaluados. */
     public void calcularPuntaje() {
-        throw new UnsupportedOperationException("TODO #17");
+        if (resultadosFactor.isEmpty()) {
+            throw new IllegalStateException("La competencia no tiene factores evaluados");
+        }
+        float suma = 0;
+        for (ResultadoFactor resultado : resultadosFactor) {
+            suma += resultado.getPuntaje();
+        }
+        puntajeObtenido = suma / resultadosFactor.size();
     }
 
     public Competencia getCompetencia() {

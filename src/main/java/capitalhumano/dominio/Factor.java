@@ -35,8 +35,19 @@ public class Factor extends SujetoAuditable {
         return competencia;
     }
 
+    /**
+     * Observación 3 de CU026: total del factor = suma de las ponderaciones obtenidas / 2.
+     * Se divide por la cantidad de preguntas del factor, que el sorteo fija en 2.
+     */
     public float calcularPuntaje(List<PreguntaSeleccionada> preguntas) {
-        throw new UnsupportedOperationException("TODO #17");
+        if (preguntas == null || preguntas.isEmpty()) {
+            throw new IllegalArgumentException("El factor " + codigo + " no tiene preguntas para calcular el puntaje");
+        }
+        double suma = 0;
+        for (PreguntaSeleccionada pregunta : preguntas) {
+            suma += pregunta.getPonderacionObtenida();
+        }
+        return (float) (suma / preguntas.size());
     }
 
     @Override
