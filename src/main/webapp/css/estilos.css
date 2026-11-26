@@ -186,3 +186,99 @@ th { background: var(--azul); color: var(--blanco); font-weight: 600; }
     color: #8a0000;
     font-size: 1.25rem;
 }
+
+/* CU020: Gestión de preguntas */
+.texto-mayusculas {
+    text-transform: uppercase;
+}
+.cu020-barra-acciones {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+.cu020-botones-principales {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.cu020-sugerencia {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--gris-texto);
+    max-width: 460px;
+}
+.cu020-alerta {
+    margin-top: 16px;
+    margin-bottom: 0;
+}
+.cu020-enunciado {
+    font-size: 0.88rem;
+    color: var(--gris-texto);
+    margin-top: 2px;
+}
+.cu020-col-acciones {
+    white-space: nowrap;
+    width: 1%;
+    text-align: center;
+}
+.boton-icono {
+    display: inline-block;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: var(--blanco);
+    color: #1f1f1f;
+    font-size: 0.9rem;
+    text-decoration: none;
+    cursor: pointer;
+    margin: 0 2px;
+}
+.boton-icono--deshabilitado {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: #f2f2f2;
+    color: #777;
+}
+.boton-icono--eliminar {
+    border-color: var(--rojo);
+    color: var(--rojo);
+}
+.boton-icono--eliminar:hover {
+    background: var(--rojo);
+    color: var(--blanco);
+}
+.paginador {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+}
+.paginador__item {
+    display: inline-block;
+    min-width: 32px;
+    padding: 4px 10px;
+    text-align: center;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #1f1f1f;
+    background: var(--blanco);
+    border: 1px solid #ccc;
+    font-size: 0.95rem;
+}
+.paginador__item:hover {
+    background: #eef1f5;
+}
+.paginador__item--activa {
+    background: var(--azul);
+    color: var(--blanco);
+    border-color: var(--azul);
+    font-weight: 600;
+}
+.paginador__item--deshabilitado {
+    opacity: 0.4;
+    cursor: default;
+}
