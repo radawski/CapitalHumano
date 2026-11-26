@@ -326,14 +326,6 @@ public class JdbcEvaluacionDAO implements EvaluacionDAO {
         }
     }
 
-    private static Timestamp aTimestamp(LocalDateTime t) {
-        return t == null ? null : Timestamp.valueOf(t);
-    }
-
-    private static LocalDateTime aLocalDateTime(Timestamp t) {
-        return t == null ? null : t.toLocalDateTime();
-    }
-
     @Override
     public void guardarBloque(Cuestionario cuestionario, BloqueCuestionario bloque) {
         throw new UnsupportedOperationException("TODO #16");
