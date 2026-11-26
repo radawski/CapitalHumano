@@ -2,6 +2,7 @@ package capitalhumano.dtos;
 
 import capitalhumano.dominio.Competencia;
 import capitalhumano.dominio.Puesto;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,8 +13,20 @@ public class DatosPuestoEvaluacionDTO {
     private List<Competencia> competenciasNoEvaluables;
 
     public DatosPuestoEvaluacionDTO(Puesto puesto, Map<Competencia, Double> ponderaciones,
-                                    List<Competencia> competenciasNoEvaluables) {
-        throw new UnsupportedOperationException("TODO #11");
+            List<Competencia> competenciasNoEvaluables) {
+        if (puesto == null) {
+            throw new IllegalArgumentException("El puesto no puede ser nulo.");
+        }
+        if (ponderaciones == null) {
+            throw new IllegalArgumentException("Las ponderaciones no pueden ser nulas.");
+        }
+        if (competenciasNoEvaluables == null) {
+            throw new IllegalArgumentException("La lista de competencias no evaluables no puede ser nula.");
+        }
+
+        this.puesto = puesto;
+        this.ponderacionesRequeridas = new LinkedHashMap<>(ponderaciones);
+        this.competenciasNoEvaluables = List.copyOf(competenciasNoEvaluables);
     }
 
     public Puesto getPuesto() {
