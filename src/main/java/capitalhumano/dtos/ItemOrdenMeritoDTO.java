@@ -20,8 +20,21 @@ public class ItemOrdenMeritoDTO {
     private LocalDateTime ultimoIngreso;
     private int cantidadAccesos;
 
+    /**
+     * Fila del listado de CU028. El puntaje llega null cuando el cuestionario no está completo
+     * (Observación 1); la posición la asigna {@code OrdenMeritoDTO.ordenar()} solo a los aprobados.
+     */
     public ItemOrdenMeritoDTO(Candidato candidato, Cuestionario cuestionario, Float puntaje) {
-        throw new UnsupportedOperationException("TODO #6");
+        this.tipoDocumento = candidato.getTipoDocumento();
+        this.nroDocumento = candidato.getNroDocumento();
+        this.apellido = candidato.getApellido();
+        this.nombre = candidato.getNombre();
+        this.puntajeObtenido = puntaje;
+        this.estadoCuestionario = cuestionario.getNombreEstado();
+        this.fechaInicio = cuestionario.getFechaHoraInicio();
+        this.fechaFin = cuestionario.getFechaHoraFin();
+        this.ultimoIngreso = cuestionario.getUltimoIngreso();
+        this.cantidadAccesos = cuestionario.getCantidadAccesos();
     }
 
     public void setPosicion(int posicion) {

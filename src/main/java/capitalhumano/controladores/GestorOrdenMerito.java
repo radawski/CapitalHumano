@@ -1,9 +1,14 @@
 package capitalhumano.controladores;
 
+import capitalhumano.dominio.Candidato;
+import capitalhumano.dominio.Cuestionario;
+import capitalhumano.dominio.Evaluacion;
 import capitalhumano.dominio.Puesto;
 import capitalhumano.dtos.EvaluacionResumenDTO;
+import capitalhumano.dtos.ItemOrdenMeritoDTO;
 import capitalhumano.dtos.OrdenMeritoDTO;
 import capitalhumano.dtos.PuestoResumenDTO;
+import capitalhumano.enumeraciones.NombreEstadoCuestionario;
 import capitalhumano.persistencia.EvaluacionDAO;
 import capitalhumano.persistencia.PuestoDAO;
 import java.util.ArrayList;
@@ -34,11 +39,49 @@ public class GestorOrdenMerito {
         return resumenes;
     }
 
+    /** CU028 pasos 5–6: evaluaciones del puesto (lista vacía dispara el flujo 6.A en la pantalla). */
     public List<EvaluacionResumenDTO> obtenerEvaluaciones(String puestoCodigo) {
-        throw new UnsupportedOperationException("TODO #6");
+        Puesto puesto = puestoDAO.obtenerConCompetencias(puestoCodigo);
+        List<EvaluacionResumenDTO> resumenes = new ArrayList<>();
+        if (puesto == null) {
+            return resumenes;
+        }
+        for (Evaluacion evaluacion : evaluacionDAO.obtenerEvaluacionesPorPuesto(puesto)) {
+            resumenes.add(new EvaluacionResumenDTO(evaluacion));
+        }
+        return resumenes;
     }
 
+    /**
+     * CU028 paso 7: clasifica a los candidatos de las evaluaciones elegidas. Los cuestionarios
+     * COMPLETOS van a aprobados o no aprobados según {@code alcanzaMinimos}; el resto se agrupa
+     * por estado y sin puntaje (Observación 1).
+     */
     public OrdenMeritoDTO generarOrdenMerito(String puestoCodigo, List<UUID> evaluacionIds) {
-        throw new UnsupportedOperationException("TODO #6");
+        Puesto puesto = puestoDAO.obtenerConCompetencias(puestoCodigo);
+        if (puesto == null) {
+            throw new IllegalArgumentException("No existe el puesto " + puestoCodigo);
+        }
+        List<Evaluacion> evaluaciones = evaluacionDAO.obtenerEvaluaciones(evaluacionIds);
+        OrdenMeritoDTO ordenMerito = new OrdenMeritoDTO(puesto, evaluaciones);
+        for (Evaluacion evaluacion : evaluaciones) {
+            for (Cuestionario cuestionario : evaluacion.getCuestionarios()) {
+                Candidato candidato = cuestionario.getCandidato();
+                NombreEstadoCuestionario estado = cuestionario.getNombreEstado();
+                if (estado == NombreEstadoCuestionario.COMPLETO) {
+                    float puntaje = cuestionario.getPuntajeTotal();
+                    ItemOrdenMeritoDTO item = new ItemOrdenMeritoDTO(candidato, cuestionario, puntaje);
+                    if (cuestionario.alcanzaMinimos(puesto)) {
+                        ordenMerito.agregarAprobado(item);
+                    } else {
+                        ordenMerito.agregarNoAprobado(item);
+                    }
+                } else {
+                    ordenMerito.agregarNoCompleto(estado, new ItemOrdenMeritoDTO(candidato, cuestionario, null));
+                }
+            }
+        }
+        ordenMerito.ordenar();
+        return ordenMerito;
     }
 }

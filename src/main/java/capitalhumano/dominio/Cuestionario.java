@@ -20,6 +20,11 @@ public class Cuestionario {
     private static final SecureRandom RANDOM = new SecureRandom();
     /** Observación 1 de CU026: se sortean 2 preguntas por factor. */
     private static final int PREGUNTAS_POR_FACTOR = 2;
+    /**
+     * Los puntajes son float (NUMERIC(5,2) en la base) y las ponderaciones double: sin tolerancia,
+     * un 5.10 leído como float (5.0999999) no alcanzaría un mínimo de 5.10.
+     */
+    private static final double TOLERANCIA_PUNTAJE = 1e-4;
 
     private UUID id;
     private String clave;
@@ -260,12 +265,46 @@ public class Cuestionario {
         return resultados;
     }
 
+    /** CU028: promedio de los puntajes de los {@code ResultadoCompetencia} (escala 0 a 10); 0 si no hay. */
     public float getPuntajeTotal() {
-        throw new UnsupportedOperationException("TODO #6");
+        if (resultados == null || resultados.isEmpty()) {
+            return 0f;
+        }
+        double suma = 0;
+        for (ResultadoCompetencia resultado : resultados) {
+            suma += resultado.getPuntaje();
+        }
+        return (float) (suma / resultados.size());
     }
 
+    /**
+     * CU028: el cuestionario está COMPLETO y en <b>todas</b> las competencias del puesto el puntaje
+     * alcanza la ponderación mínima. Una competencia del puesto sin resultado cuenta como no alcanzada.
+     */
     public boolean alcanzaMinimos(Puesto puesto) {
-        throw new UnsupportedOperationException("TODO #6");
+        if (getNombreEstado() != NombreEstadoCuestionario.COMPLETO) {
+            return false;
+        }
+        for (Competencia competencia : puesto.getCompetencias()) {
+            ResultadoCompetencia resultado = buscarResultado(competencia);
+            if (resultado == null
+                    || resultado.getPuntaje() + TOLERANCIA_PUNTAJE < puesto.getPonderacionRequerida(competencia)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private ResultadoCompetencia buscarResultado(Competencia competencia) {
+        if (resultados == null) {
+            return null;
+        }
+        for (ResultadoCompetencia resultado : resultados) {
+            if (competencia.equals(resultado.getCompetencia())) {
+                return resultado;
+            }
+        }
+        return null;
     }
 
     public void iniciar() {
