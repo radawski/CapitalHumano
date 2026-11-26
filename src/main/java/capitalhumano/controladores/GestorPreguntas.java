@@ -11,6 +11,7 @@ import capitalhumano.persistencia.CompetenciaDAO;
 import capitalhumano.persistencia.PreguntaDAO;
 import capitalhumano.servicios.ServicioGeneracionIA;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class GestorPreguntas {
@@ -26,15 +27,21 @@ public class GestorPreguntas {
     }
 
     public List<Competencia> obtenerCompetencias() {
-        throw new UnsupportedOperationException("TODO #3");
+        return competenciaDAO.buscarPorNombre("");
     }
 
     public List<Factor> obtenerFactores(Competencia competencia) {
-        throw new UnsupportedOperationException("TODO #3");
+        if (competencia == null) {
+            return List.of();
+        }
+        return competenciaDAO.obtenerFactores(competencia);
     }
 
     public List<Pregunta> buscarPreguntas(Competencia competencia, Factor factor, String nombrePregunta) {
-        throw new UnsupportedOperationException("TODO #3");
+        String nombreNormalizado = (nombrePregunta == null || nombrePregunta.isBlank())
+                ? null
+                : nombrePregunta.trim().toUpperCase(Locale.ROOT);
+        return preguntaDAO.buscar(competencia, factor, nombreNormalizado);
     }
 
     public List<OpcionDeRespuesta> obtenerOpcionesDeRespuesta() {

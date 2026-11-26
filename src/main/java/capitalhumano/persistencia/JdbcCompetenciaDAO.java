@@ -2,6 +2,7 @@ package capitalhumano.persistencia;
 
 import capitalhumano.dominio.Competencia;
 import capitalhumano.dominio.Factor;
+import capitalhumano.enumeraciones.TipoCompetencia;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,7 +35,35 @@ public class JdbcCompetenciaDAO implements CompetenciaDAO {
 
     @Override
     public List<Competencia> buscarPorNombre(String nombre) {
-        throw new UnsupportedOperationException("TODO #3");
+        StringBuilder sql = new StringBuilder(
+                "SELECT cod_competencia, nombre, descripcion, tipo, activa FROM competencia WHERE activa = TRUE");
+        boolean tieneNombre = nombre != null && !nombre.isBlank();
+        if (tieneNombre) {
+            sql.append(" AND nombre ILIKE ?");
+        }
+        sql.append(" ORDER BY nombre");
+
+        List<Competencia> competencias = new ArrayList<>();
+        try (Connection conn = conexionBD.getConexion();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            if (tieneNombre) {
+                ps.setString(1, "%" + nombre.trim() + "%");
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    competencias.add(new Competencia(
+                            rs.getString("cod_competencia"),
+                            rs.getString("nombre"),
+                            rs.getString("descripcion"),
+                            TipoCompetencia.valueOf(rs.getString("tipo")),
+                            rs.getBoolean("activa")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al buscar competencias por nombre", e);
+        }
+        return competencias;
     }
 
     @Override
