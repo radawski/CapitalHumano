@@ -69,6 +69,17 @@ public class GestorEvaluacionCandidatos {
     }
 
     public void exportarClaves(Evaluacion evaluacion, String carpeta) {
-        throw new UnsupportedOperationException("TODO #13");
+        if (evaluacion == null || evaluacion.getPuesto() == null) {
+            throw new IllegalArgumentException("La evaluación y/o el puesto de la misma no pueden ser nulos.");
+        }
+        if (carpeta == null || carpeta.isBlank()) {
+            throw new IllegalArgumentException("Debe seleccionar una carpeta.");
+        }
+
+        Puesto puesto = evaluacion.getPuesto();
+        String nombrePuesto = puesto.getNombre();
+        List<ClaveCandidatoDTO> claves = obtenerClavesCandidatos(evaluacion);
+
+        servicioExportacionClaves.exportarClavesCandidatos(claves, nombrePuesto, carpeta);
     }
 }
