@@ -1,0 +1,13 @@
+<%-- CU028, Observación 2: datos adicionales de la fila ${item} (ItemOrdenMeritoDTO).
+     Completos: fecha de inicio, fecha de fin y cantidad de accesos.
+     No completos: fecha de inicio, último ingreso y cantidad de accesos. --%>
+Inicio: <c:out value="${empty item.fechaInicio ? '-' : item.fechaInicio.format(formatoFechaHora)}"/>
+<c:choose>
+    <c:when test="${item.estadoCuestionario == 'COMPLETO'}">
+        · Fin: <c:out value="${empty item.fechaFin ? '-' : item.fechaFin.format(formatoFechaHora)}"/>
+    </c:when>
+    <c:otherwise>
+        · Último ingreso: <c:out value="${empty item.ultimoIngreso ? '-' : item.ultimoIngreso.format(formatoFechaHora)}"/>
+    </c:otherwise>
+</c:choose>
+· Accesos: <c:out value="${item.cantidadAccesos}"/>

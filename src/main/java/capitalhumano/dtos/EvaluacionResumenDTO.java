@@ -11,7 +11,9 @@ public class EvaluacionResumenDTO {
     private int cantidadCandidatos;
 
     public EvaluacionResumenDTO(Evaluacion evaluacion) {
-        throw new UnsupportedOperationException("TODO #6");
+        this.evaluacionId = evaluacion.getId();
+        this.fechaCreacion = evaluacion.getFechaCreacion();
+        this.cantidadCandidatos = evaluacion.getCuestionarios().size();
     }
 
     public UUID getEvaluacionId() {

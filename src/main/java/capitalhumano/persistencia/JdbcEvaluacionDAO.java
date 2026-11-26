@@ -732,39 +732,128 @@ public class JdbcEvaluacionDAO implements EvaluacionDAO {
 
     private void cargarEvaluacion(Connection con, UUID idEvaluacion, Cuestionario cuestionario, CatalogoCU026 catalogo)
             throws SQLException {
-        String sqlEvaluacion = "SELECT e.id_evaluacion, e.fecha_creacion, e.activa, "
-                             + "p.cod_puesto, p.nombre, p.descripcion, p.empresa, p.activo "
-                             + "FROM evaluacion e JOIN puesto p ON p.cod_puesto = e.cod_puesto "
-                             + "WHERE e.id_evaluacion = ?";
-        String sqlCompetencias = "SELECT cod_competencia, ponderacion_minima FROM puesto_competencia "
-                               + "WHERE cod_puesto = ? ORDER BY cod_competencia";
+        String sqlEvaluacion = "SELECT e.id_evaluacion, e.fecha_creacion, e.activa, e.cod_puesto "
+                             + "FROM evaluacion e WHERE e.id_evaluacion = ?";
         try (PreparedStatement ps = con.prepareStatement(sqlEvaluacion)) {
             ps.setObject(1, idEvaluacion);
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) {
                     throw new IllegalStateException("No existe la evaluación " + idEvaluacion);
                 }
-                String codPuesto = rs.getString("cod_puesto");
-                Map<String, Double> minimos = new LinkedHashMap<>();
-                try (PreparedStatement psComp = con.prepareStatement(sqlCompetencias)) {
-                    psComp.setString(1, codPuesto);
-                    try (ResultSet rsComp = psComp.executeQuery()) {
-                        while (rsComp.next()) {
-                            minimos.put(rsComp.getString("cod_competencia"), rsComp.getDouble("ponderacion_minima"));
-                        }
-                    }
-                }
-                Map<Competencia, PonderacionPuesto> ponderaciones = new LinkedHashMap<>();
-                for (Map.Entry<String, Double> minimo : minimos.entrySet()) {
-                    ponderaciones.put(cargarCompetencia(con, minimo.getKey(), catalogo),
-                            new PonderacionPuesto(minimo.getValue()));
-                }
-                Puesto puesto = new Puesto(codPuesto, rs.getString("nombre"), rs.getString("descripcion"),
-                        rs.getString("empresa"), rs.getBoolean("activo"), ponderaciones);
+                Puesto puesto = cargarPuesto(con, rs.getString("cod_puesto"), catalogo);
                 new Evaluacion(idEvaluacion, rs.getDate("fecha_creacion").toLocalDate(), rs.getBoolean("activa"),
                         puesto, List.of(cuestionario));
             }
         }
+    }
+
+    /** Puesto con sus competencias y ponderaciones mínimas (lo usan CU026 y CU028). */
+    private Puesto cargarPuesto(Connection con, String codPuesto, CatalogoCU026 catalogo) throws SQLException {
+        String sqlPuesto = "SELECT cod_puesto, nombre, descripcion, empresa, activo FROM puesto WHERE cod_puesto = ?";
+        String sqlCompetencias = "SELECT cod_competencia, ponderacion_minima FROM puesto_competencia "
+                               + "WHERE cod_puesto = ? ORDER BY cod_competencia";
+        Map<String, Double> minimos = new LinkedHashMap<>();
+        try (PreparedStatement psComp = con.prepareStatement(sqlCompetencias)) {
+            psComp.setString(1, codPuesto);
+            try (ResultSet rsComp = psComp.executeQuery()) {
+                while (rsComp.next()) {
+                    minimos.put(rsComp.getString("cod_competencia"), rsComp.getDouble("ponderacion_minima"));
+                }
+            }
+        }
+        Map<Competencia, PonderacionPuesto> ponderaciones = new LinkedHashMap<>();
+        for (Map.Entry<String, Double> minimo : minimos.entrySet()) {
+            ponderaciones.put(cargarCompetencia(con, minimo.getKey(), catalogo),
+                    new PonderacionPuesto(minimo.getValue()));
+        }
+        try (PreparedStatement ps = con.prepareStatement(sqlPuesto)) {
+            ps.setString(1, codPuesto);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    throw new IllegalStateException("No existe el puesto " + codPuesto);
+                }
+                return new Puesto(codPuesto, rs.getString("nombre"), rs.getString("descripcion"),
+                        rs.getString("empresa"), rs.getBoolean("activo"), ponderaciones);
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------------------------
+    // CU028 (#6): evaluaciones con sus cuestionarios, candidatos y resultados
+    // ---------------------------------------------------------------------------------
+
+    private static final String SELECT_EVALUACION =
+            "SELECT id_evaluacion, cod_puesto, fecha_creacion, activa FROM evaluacion ";
+
+    @FunctionalInterface
+    private interface ParametrosJdbc {
+        void aplicar(PreparedStatement ps) throws SQLException;
+    }
+
+    private List<Evaluacion> cargarEvaluaciones(String sql, ParametrosJdbc parametros, String mensajeError) {
+        try (Connection con = conexionBD.getConexion()) {
+            List<UUID> ids = new ArrayList<>();
+            List<String> puestosPorEvaluacion = new ArrayList<>();
+            List<java.time.LocalDate> fechas = new ArrayList<>();
+            List<Boolean> activas = new ArrayList<>();
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                parametros.aplicar(ps);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        ids.add(rs.getObject("id_evaluacion", UUID.class));
+                        puestosPorEvaluacion.add(rs.getString("cod_puesto"));
+                        fechas.add(rs.getDate("fecha_creacion").toLocalDate());
+                        activas.add(rs.getBoolean("activa"));
+                    }
+                }
+            }
+
+            CatalogoCU026 catalogo = new CatalogoCU026();
+            Map<String, Puesto> puestos = new HashMap<>();
+            List<Evaluacion> evaluaciones = new ArrayList<>();
+            for (int i = 0; i < ids.size(); i++) {
+                String codPuesto = puestosPorEvaluacion.get(i);
+                Puesto puesto = puestos.get(codPuesto);
+                if (puesto == null) {
+                    puesto = cargarPuesto(con, codPuesto, catalogo);
+                    puestos.put(codPuesto, puesto);
+                }
+                List<Cuestionario> cuestionarios = cargarCuestionariosDeEvaluacion(con, ids.get(i), catalogo);
+                evaluaciones.add(new Evaluacion(ids.get(i), fechas.get(i), activas.get(i), puesto, cuestionarios));
+            }
+            return evaluaciones;
+        } catch (SQLException e) {
+            throw new RuntimeException(mensajeError, e);
+        }
+    }
+
+    /** Cuestionarios de la evaluación con su candidato; los COMPLETOS, además, con sus resultados. */
+    private List<Cuestionario> cargarCuestionariosDeEvaluacion(Connection con, UUID idEvaluacion,
+            CatalogoCU026 catalogo) throws SQLException {
+        List<Cuestionario> bases = new ArrayList<>();
+        try (PreparedStatement ps = con.prepareStatement(
+                SELECT_CUESTIONARIO + "WHERE c.id_evaluacion = ? ORDER BY cand.apellido, cand.nombre")) {
+            ps.setObject(1, idEvaluacion);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    bases.add(mapearCuestionario(rs));
+                }
+            }
+        }
+        List<Cuestionario> cuestionarios = new ArrayList<>();
+        for (Cuestionario base : bases) {
+            if (base.getNombreEstado() != NombreEstadoCuestionario.COMPLETO) {
+                cuestionarios.add(base);
+                continue;
+            }
+            List<ResultadoCompetencia> resultados = cargarResultados(con, base.getId(), catalogo);
+            cuestionarios.add(new Cuestionario(
+                    base.getId(), base.getClave(), mapearEstadoCuestionario(base.getNombreEstado().name()),
+                    base.getFechaCreacion(), base.getFechaHoraInicio(), base.getFechaHoraFin(),
+                    base.getUltimoIngreso(), base.getCantidadAccesos(), base.getFechaHoraCambioEstado(),
+                    base.getCandidato(), base.getConfiguracion(), new ArrayList<>(), resultados));
+        }
+        return cuestionarios;
     }
 
     @Override
@@ -772,14 +861,22 @@ public class JdbcEvaluacionDAO implements EvaluacionDAO {
         throw new UnsupportedOperationException("Fuera del alcance de la entrega final (CU032)");
     }
 
+    /** CU028 paso 5: evaluaciones del puesto, de la más vieja a la más nueva. */
     @Override
     public List<Evaluacion> obtenerEvaluacionesPorPuesto(Puesto puesto) {
-        throw new UnsupportedOperationException("TODO #6");
+        return cargarEvaluaciones(SELECT_EVALUACION + "WHERE cod_puesto = ? ORDER BY fecha_creacion, id_evaluacion",
+                ps -> ps.setString(1, puesto.getCodigo()), "Error al obtener las evaluaciones del puesto");
     }
 
+    /** CU028 paso 7: las evaluaciones elegidas, con cuestionarios, candidatos y resultados. */
     @Override
     public List<Evaluacion> obtenerEvaluaciones(List<UUID> ids) {
-        throw new UnsupportedOperationException("TODO #6");
+        if (ids == null || ids.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return cargarEvaluaciones(SELECT_EVALUACION + "WHERE id_evaluacion = ANY (?) ORDER BY fecha_creacion, id_evaluacion",
+                ps -> ps.setArray(1, ps.getConnection().createArrayOf("uuid", ids.toArray())),
+                "Error al obtener las evaluaciones");
     }
 
     /** CU028 paso 4: candidatos distintos con cuestionario en alguna evaluación del puesto. */
