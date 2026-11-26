@@ -19,7 +19,16 @@
     <h1 class="cabecera__titulo"><c:out value="${titulo}"/></h1>
     <div class="cabecera__usuario">
         <span class="cabecera__icono" aria-hidden="true">&#128100;</span>
-        Usuario: <c:out value="${empty sessionScope.usuario ? '[sin sesión]' : sessionScope.usuario}"/>
+        <c:choose>
+            <c:when test="${not empty sessionScope.usuario}">
+                Usuario: <c:out value="${sessionScope.usuario}"/>
+                &middot; <a style="color: inherit" href="${pageContext.request.contextPath}/login?salir=1">Salir</a>
+            </c:when>
+            <c:otherwise>
+                Usuario: [sin sesión]
+                &middot; <a style="color: inherit" href="${pageContext.request.contextPath}/login">Ingresar</a>
+            </c:otherwise>
+        </c:choose>
     </div>
 </header>
 <nav class="menu">

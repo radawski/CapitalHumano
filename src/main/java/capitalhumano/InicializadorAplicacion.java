@@ -5,9 +5,10 @@ import capitalhumano.adapters.AdaptadorExportacionResultadosCSV;
 import capitalhumano.adapters.AdaptadorGeneracionIAExterna;
 import capitalhumano.adapters.AdaptadorImportacionCSV;
 import capitalhumano.adapters.AdaptadorLDAP;
+import capitalhumano.adapters.AutenticacionCandidatoClave;
+import capitalhumano.adapters.AutenticacionConsultorLDAP;
 import capitalhumano.adapters.FabricaCuestionarios;
 import capitalhumano.adapters.RegistradorAuditoria;
-import capitalhumano.controladores.GestorAutenticacion;
 import capitalhumano.controladores.GestorBajasCatalogos;
 import capitalhumano.controladores.GestorCompetencias;
 import capitalhumano.controladores.GestorCuestionarios;
@@ -81,8 +82,9 @@ public class InicializadorAplicacion implements ServletContextListener {
         // Gestores
         GestorCuestionarios gestorCuestionarios = new GestorCuestionarios(evaluacionDAO, competenciaDAO, preguntaDAO);
         registrar(contexto, GestorCuestionarios.class, gestorCuestionarios);
-        registrar(contexto, GestorAutenticacion.class, new GestorAutenticacion());
-        registrar(contexto, AdaptadorLDAP.class, new AdaptadorLDAP());
+        // CU001: las estrategias no tienen estado; el GestorAutenticacion sí, lo crea PantallaAutenticar
+        registrar(contexto, AutenticacionConsultorLDAP.class, new AutenticacionConsultorLDAP(new AdaptadorLDAP()));
+        registrar(contexto, AutenticacionCandidatoClave.class, new AutenticacionCandidatoClave(gestorCuestionarios));
         registrar(contexto, GestorImportacionCandidatos.class,
                 new GestorImportacionCandidatos(new AdaptadorImportacionCSV(), candidatoDAO));
         registrar(contexto, GestorExportacionResultados.class,
