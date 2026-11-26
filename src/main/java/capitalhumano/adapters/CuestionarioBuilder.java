@@ -11,14 +11,22 @@ public class CuestionarioBuilder {
     private ConfiguracionCuestionario configuracion;
 
     public CuestionarioBuilder conCandidato(Candidato candidato) {
-        throw new UnsupportedOperationException("TODO #12");
+        this.candidato = candidato;
+        return this;
     }
 
     public CuestionarioBuilder conConfiguracion(ConfiguracionCuestionario configuracion) {
-        throw new UnsupportedOperationException("TODO #12");
+        this.configuracion = configuracion;
+        return this;
     }
 
     public Cuestionario construir() {
-        throw new UnsupportedOperationException("TODO #12");
+        if (candidato == null) {
+            throw new IllegalStateException("Debe asignar un candidato antes de construir el cuestionario");
+        }
+        if (configuracion == null) {
+            throw new IllegalStateException("Debe asignar una configuración antes de construir el cuestionario");
+        }
+        return new Cuestionario(candidato, configuracion);
     }
 }

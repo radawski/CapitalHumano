@@ -1,13 +1,20 @@
 package capitalhumano.dominio;
 
 import capitalhumano.enumeraciones.NombreEstadoCuestionario;
+
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Cuestionario {
+
+    private static final String ALFABETO_CLAVE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final int LONGITUD_CLAVE = 8;
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     private UUID id;
     private String clave;
@@ -30,15 +37,24 @@ public class Cuestionario {
     private List<ResultadoCompetencia> resultados = new ArrayList<>();
 
     public Cuestionario(Candidato candidato, ConfiguracionCuestionario configuracion) {
-        throw new UnsupportedOperationException("TODO #12");
+        this.id = UUID.randomUUID();
+        this.candidato = Objects.requireNonNull(candidato, "El candidato no puede ser nulo");
+        this.configuracion = Objects.requireNonNull(configuracion, "La configuración no puede ser nula");
+        this.fechaCreacion = LocalDateTime.now();
+        this.fechaHoraCambioEstado = fechaCreacion;
+        this.cantidadAccesos = 0;
+        this.estado = new EstadoActivo();
+        this.clave = generarClave();
     }
 
-    /** Constructor de reconstrucción (no figura en el diagrama): lo usan los DAO. */
+    /**
+     * Constructor de reconstrucción (no figura en el diagrama): lo usan los DAO.
+     */
     public Cuestionario(UUID id, String clave, EstadoCuestionario estado, LocalDateTime fechaCreacion,
-                        LocalDateTime fechaHoraInicio, LocalDateTime fechaHoraFin, LocalDateTime ultimoIngreso,
-                        int cantidadAccesos, LocalDateTime fechaHoraCambioEstado, Candidato candidato,
-                        ConfiguracionCuestionario configuracion, List<BloqueCuestionario> bloques,
-                        List<ResultadoCompetencia> resultados) {
+            LocalDateTime fechaHoraInicio, LocalDateTime fechaHoraFin, LocalDateTime ultimoIngreso,
+            int cantidadAccesos, LocalDateTime fechaHoraCambioEstado, Candidato candidato,
+            ConfiguracionCuestionario configuracion, List<BloqueCuestionario> bloques,
+            List<ResultadoCompetencia> resultados) {
         this.id = id;
         this.clave = clave;
         this.estado = estado;
@@ -95,7 +111,12 @@ public class Cuestionario {
     }
 
     public String generarClave() {
-        throw new UnsupportedOperationException("TODO #12");
+        StringBuilder sb = new StringBuilder(LONGITUD_CLAVE);
+        for (int i = 0; i < LONGITUD_CLAVE; i++) {
+            sb.append(ALFABETO_CLAVE.charAt(RANDOM.nextInt(ALFABETO_CLAVE.length())));
+        }
+        this.clave = sb.toString();
+        return this.clave;
     }
 
     public void registrarAcceso() {
@@ -170,7 +191,10 @@ public class Cuestionario {
         this.estado = nuevoEstado;
     }
 
-    /** Navegabilidad inversa de la composición con Evaluacion (no figura en el diagrama). */
+    /**
+     * Navegabilidad inversa de la composición con Evaluacion (no figura en el
+     * diagrama).
+     */
     void setEvaluacion(Evaluacion evaluacion) {
         this.evaluacion = evaluacion;
     }
