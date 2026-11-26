@@ -2,9 +2,12 @@ package capitalhumano.controladores;
 
 import capitalhumano.adapters.FabricaCuestionarios;
 import capitalhumano.dominio.Candidato;
+import capitalhumano.dominio.Competencia;
 import capitalhumano.dominio.ConfiguracionCuestionario;
 import capitalhumano.dominio.Cuestionario;
 import capitalhumano.dominio.Evaluacion;
+import capitalhumano.dominio.Factor;
+import capitalhumano.dominio.Pregunta;
 import capitalhumano.dominio.Puesto;
 import capitalhumano.dtos.ClaveCandidatoDTO;
 import capitalhumano.dtos.DatosPuestoEvaluacionDTO;
@@ -17,7 +20,9 @@ import capitalhumano.persistencia.PuestoDAO;
 import capitalhumano.servicios.ServicioExportacionClaves;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class GestorEvaluacionCandidatos {
@@ -64,11 +69,39 @@ public class GestorEvaluacionCandidatos {
     }
 
     public List<Puesto> listarPuestos() {
-        throw new UnsupportedOperationException("TODO #11");
+        return puestoDAO.buscarPorFiltros(null, null, null);
     }
 
     public DatosPuestoEvaluacionDTO obtenerDatosPuestoYCompetencias(String puestoCodigo) {
-        throw new UnsupportedOperationException("TODO #11");
+        if (puestoCodigo == null || puestoCodigo.isBlank()) {
+            throw new IllegalArgumentException("El puesto no puede ser nulo ni vacío.");
+        }
+
+        Puesto puesto = puestoDAO.obtenerConCompetencias(puestoCodigo);
+        if (puesto == null) {
+            throw new IllegalArgumentException("No existe puesto para el codigo " + puestoCodigo + ".");
+        }
+        List<Competencia> competencias = puesto.getCompetencias();
+        Map<Competencia, Double> ponderaciones = new LinkedHashMap<>();
+        List<Competencia> competenciasNoEvaluables = new ArrayList<>();
+
+        for (Competencia c : competencias) {
+            ponderaciones.put(c, puesto.getPonderacionRequerida(c));
+
+            List<Factor> factores = competenciaDAO.obtenerFactores(c);
+            boolean tieneFactorEvaluable = false;
+            for (Factor f : factores) {
+                List<Pregunta> preguntas = preguntaDAO.obtenerPreguntasActivasPorFactor(f);
+                if (preguntas != null && preguntas.size() >= 2) {
+                    tieneFactorEvaluable = true;
+                }
+            }
+            if (!tieneFactorEvaluable) {
+                competenciasNoEvaluables.add(c);
+            }
+        }
+
+        return new DatosPuestoEvaluacionDTO(puesto, ponderaciones, competenciasNoEvaluables);
     }
 
     public Evaluacion generarEvaluacion(List<Candidato> candidatos, Puesto puesto) {

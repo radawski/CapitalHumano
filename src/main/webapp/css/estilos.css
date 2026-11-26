@@ -152,6 +152,21 @@ th { background: var(--azul); color: var(--blanco); font-weight: 600; }
     background: #fdecec;
     color: #8a0000;
 }
+.alerta--exito {
+    border-left-color: #1f7a3e;
+    background: #eaf7ef;
+    color: #145229;
+}
+.clave-codigo {
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+.tabla-fila-opcion {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 .tabla-scroll {
     max-height: 360px;
     overflow-y: auto;
