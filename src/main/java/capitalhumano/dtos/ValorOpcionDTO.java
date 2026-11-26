@@ -10,7 +10,9 @@ public class ValorOpcionDTO {
     private String descripcion;
 
     public ValorOpcionDTO(ValorOpcion valor) {
-        throw new UnsupportedOperationException("TODO #16");
+        this.valorOpcionId = valor.getId();
+        this.orden = valor.getOrden();
+        this.descripcion = valor.getDescripcion();
     }
 
     public UUID getValorOpcionId() {

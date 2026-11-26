@@ -5,6 +5,8 @@ import capitalhumano.enumeraciones.NombreEstadoCuestionario;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -16,6 +18,8 @@ public class Cuestionario {
     private static final String ALFABETO_CLAVE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final int LONGITUD_CLAVE = 8;
     private static final SecureRandom RANDOM = new SecureRandom();
+    /** Observación 1 de CU026: se sortean 2 preguntas por factor. */
+    private static final int PREGUNTAS_POR_FACTOR = 2;
 
     private UUID id;
     private String clave;
@@ -69,6 +73,11 @@ public class Cuestionario {
         this.configuracion = configuracion;
         this.bloques = new ArrayList<>(bloques);
         this.resultados = new ArrayList<>(resultados);
+    }
+
+    /** Getter sin lógica (no figura en el diagrama): lo usan los DAO. */
+    public LocalDateTime getFechaCreacion() {
+        return fechaCreacion;
     }
 
     public LocalDateTime getFechaHoraCambioEstado() {
@@ -141,28 +150,110 @@ public class Cuestionario {
         return Duration.between(fechaHoraInicio, ahora).compareTo(configuracion.getTiempoMaximo()) > 0;
     }
 
+    /**
+     * Paso 3 de CU026 (Observación 1). Elige 2 preguntas al azar por factor, las mezcla
+     * y arma los bloques según la configuración. Patrón Creador: el cuestionario crea sus
+     * PreguntaSeleccionada y sus BloqueCuestionario.
+     */
     public void asignarPreguntas(Map<Factor, List<Pregunta>> preguntasPorFactor) {
-        throw new UnsupportedOperationException("TODO #15");
+        if (preguntasPorFactor == null || preguntasPorFactor.isEmpty()) {
+            throw new IllegalArgumentException("No hay factores con preguntas suficientes para armar el cuestionario");
+        }
+        if (!bloques.isEmpty()) {
+            throw new IllegalStateException("El cuestionario ya tiene sus preguntas asignadas");
+        }
+
+        List<Pregunta> preguntasElegidas = new ArrayList<>();
+        for (List<Pregunta> preguntasDelFactor : preguntasPorFactor.values()) {
+            preguntasElegidas.addAll(elegirAlAzar(preguntasDelFactor, PREGUNTAS_POR_FACTOR));
+        }
+        mezclar(preguntasElegidas);
+
+        List<PreguntaSeleccionada> seleccionadas = new ArrayList<>();
+        for (int i = 0; i < preguntasElegidas.size(); i++) {
+            seleccionadas.add(new PreguntaSeleccionada(preguntasElegidas.get(i), i + 1));
+        }
+
+        int cantidadPorBloque = configuracion.getCantidadPreguntasPorBloque();
+        BloqueCuestionario bloque = null;
+        for (int i = 0; i < seleccionadas.size(); i++) {
+            if (i % cantidadPorBloque == 0) {
+                bloque = new BloqueCuestionario(i / cantidadPorBloque + 1);
+                bloques.add(bloque);
+            }
+            bloque.agregarPregunta(seleccionadas.get(i));
+        }
     }
 
     private List<Pregunta> elegirAlAzar(List<Pregunta> preguntas, int cantidad) {
-        throw new UnsupportedOperationException("TODO #15");
+        if (preguntas.size() < cantidad) {
+            throw new IllegalArgumentException(
+                    "El factor necesita al menos " + cantidad + " preguntas activas para ser evaluado");
+        }
+        List<Pregunta> copia = new ArrayList<>(preguntas);
+        Collections.shuffle(copia, RANDOM);
+        return new ArrayList<>(copia.subList(0, cantidad));
     }
 
     private void mezclar(List<Pregunta> preguntas) {
-        throw new UnsupportedOperationException("TODO #15");
+        Collections.shuffle(preguntas, RANDOM);
     }
 
+    /** Flujo 1.C y paso 8: el primer bloque, en orden, que todavía no está contestado (null si no queda). */
     public BloqueCuestionario getBloquePendiente() {
-        throw new UnsupportedOperationException("TODO #16");
+        for (BloqueCuestionario bloque : bloques) {
+            if (!bloque.estaContestado()) {
+                return bloque;
+            }
+        }
+        return null;
     }
 
+    /** Paso 7: guarda las respuestas del bloque pendiente. respuestas = id de pregunta → id de ValorOpcion. */
     public BloqueCuestionario responderBloque(int nroBloque, Map<UUID, UUID> respuestas) {
-        throw new UnsupportedOperationException("TODO #16");
+        if (getNombreEstado() != NombreEstadoCuestionario.EN_PROCESO) {
+            throw new IllegalStateException("Sólo se pueden responder bloques de un cuestionario en proceso");
+        }
+        BloqueCuestionario pendiente = getBloquePendiente();
+        if (pendiente == null || pendiente.getNroBloque() != nroBloque) {
+            throw new IllegalStateException("El bloque " + nroBloque + " no es el bloque pendiente del cuestionario");
+        }
+        pendiente.responder(respuestas);
+        return pendiente;
     }
 
+    /**
+     * Paso 8 (Observación 3). Por cada competencia evaluada crea su ResultadoCompetencia; el puntaje
+     * de cada factor lo calcula el propio Factor con sus preguntas seleccionadas.
+     */
     public void calcularResultados() {
-        throw new UnsupportedOperationException("TODO #17");
+        Map<Competencia, Map<Factor, List<PreguntaSeleccionada>>> porCompetencia = new LinkedHashMap<>();
+        for (BloqueCuestionario bloque : bloques) {
+            for (PreguntaSeleccionada seleccionada : bloque.getPreguntas()) {
+                Factor factor = seleccionada.getPregunta().getFactor();
+                porCompetencia
+                        .computeIfAbsent(factor.getCompetencia(), c -> new LinkedHashMap<>())
+                        .computeIfAbsent(factor, f -> new ArrayList<>())
+                        .add(seleccionada);
+            }
+        }
+
+        List<ResultadoCompetencia> nuevosResultados = new ArrayList<>();
+        for (Map.Entry<Competencia, Map<Factor, List<PreguntaSeleccionada>>> competencia : porCompetencia.entrySet()) {
+            ResultadoCompetencia resultado = new ResultadoCompetencia(competencia.getKey());
+            for (Map.Entry<Factor, List<PreguntaSeleccionada>> factor : competencia.getValue().entrySet()) {
+                float puntajeFactor = factor.getKey().calcularPuntaje(factor.getValue());
+                resultado.agregarResultadoFactor(factor.getKey(), puntajeFactor);
+            }
+            resultado.calcularPuntaje();
+            nuevosResultados.add(resultado);
+        }
+        this.resultados = nuevosResultados;
+    }
+
+    /** Getter sin lógica (no figura en el diagrama): lo usan los DAO y BloqueDTO. */
+    public List<BloqueCuestionario> getBloques() {
+        return Collections.unmodifiableList(bloques);
     }
 
     public List<ResultadoCompetencia> getResultados() {

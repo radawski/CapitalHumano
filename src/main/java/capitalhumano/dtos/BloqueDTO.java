@@ -2,6 +2,8 @@ package capitalhumano.dtos;
 
 import capitalhumano.dominio.BloqueCuestionario;
 import capitalhumano.dominio.Cuestionario;
+import capitalhumano.dominio.PreguntaSeleccionada;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +15,15 @@ public class BloqueDTO {
     private List<PreguntaBloqueDTO> preguntas;
 
     public BloqueDTO(Cuestionario cuestionario, BloqueCuestionario bloque) {
-        throw new UnsupportedOperationException("TODO #16");
+        this.cuestionarioId = cuestionario.getId();
+        this.nroBloque = bloque.getNroBloque();
+        // Es el último si no queda ningún otro bloque sin contestar
+        this.esUltimo = cuestionario.getBloques().stream()
+                .noneMatch(otro -> otro != bloque && !otro.estaContestado());
+        this.preguntas = new ArrayList<>();
+        for (PreguntaSeleccionada preguntaSeleccionada : bloque.getPreguntas()) {
+            this.preguntas.add(new PreguntaBloqueDTO(preguntaSeleccionada));
+        }
     }
 
     public UUID getCuestionarioId() {

@@ -1,6 +1,7 @@
 package capitalhumano.dominio;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -34,18 +35,40 @@ public class BloqueCuestionario {
     }
 
     public void agregarPregunta(PreguntaSeleccionada pregunta) {
-        throw new UnsupportedOperationException("TODO #15");
+        if (pregunta == null) {
+            throw new IllegalArgumentException("La pregunta seleccionada no puede ser nula");
+        }
+        preguntas.add(pregunta);
+        cantidadPreguntas = preguntas.size();
     }
 
+    /**
+     * Paso 7 de CU026. respuestas = id de pregunta → id del ValorOpcion elegido.
+     * Primero valida que estén todas (flujo 6.A) y recién después responde, para no dejar
+     * el bloque a medias.
+     */
     public void responder(Map<UUID, UUID> respuestas) {
-        throw new UnsupportedOperationException("TODO #16");
+        if (contestado) {
+            throw new IllegalStateException("El bloque " + nroBloque + " ya fue contestado");
+        }
+        Map<PreguntaSeleccionada, ValorOpcion> elegidos = new LinkedHashMap<>();
+        for (PreguntaSeleccionada seleccionada : preguntas) {
+            Pregunta pregunta = seleccionada.getPregunta();
+            UUID valorOpcionId = respuestas == null ? null : respuestas.get(pregunta.getId());
+            if (valorOpcionId == null) {
+                throw new IllegalArgumentException("Es obligatorio responder todas las preguntas del bloque");
+            }
+            elegidos.put(seleccionada, pregunta.getValor(valorOpcionId));
+        }
+        elegidos.forEach(PreguntaSeleccionada::responder);
+        marcarContestado();
     }
 
     public boolean estaContestado() {
-        throw new UnsupportedOperationException("TODO #16");
+        return contestado;
     }
 
     private void marcarContestado() {
-        throw new UnsupportedOperationException("TODO #16");
+        this.contestado = true;
     }
 }
