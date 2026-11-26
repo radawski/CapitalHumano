@@ -11,15 +11,19 @@ public class IngresoCuestionarioDTO {
     private String mensaje;
 
     public IngresoCuestionarioDTO(ResultadoIngreso resultado, String mensaje) {
-        throw new UnsupportedOperationException("TODO #14");
+        this.resultado = resultado;
+        this.mensaje = mensaje;
     }
 
     public IngresoCuestionarioDTO(ResultadoIngreso resultado, UUID cuestionarioId) {
-        throw new UnsupportedOperationException("TODO #14");
+        this.resultado = resultado;
+        this.cuestionarioId = cuestionarioId;
     }
 
     public IngresoCuestionarioDTO(ResultadoIngreso resultado, UUID cuestionarioId, String instrucciones) {
-        throw new UnsupportedOperationException("TODO #14");
+        this.resultado = resultado;
+        this.cuestionarioId = cuestionarioId;
+        this.instrucciones = instrucciones;
     }
 
     public ResultadoIngreso getResultado() {

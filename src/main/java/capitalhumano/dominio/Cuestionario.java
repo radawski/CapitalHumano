@@ -55,6 +55,10 @@ public class Cuestionario {
         this.resultados = new ArrayList<>(resultados);
     }
 
+    public LocalDateTime getFechaHoraCambioEstado() {
+        return fechaHoraCambioEstado;
+    }
+
     public UUID getId() {
         return id;
     }
