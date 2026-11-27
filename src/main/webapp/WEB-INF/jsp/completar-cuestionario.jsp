@@ -99,7 +99,7 @@
                         <p>El sistema guardó su resultado y el cuestionario quedó en estado "Completo".</p>
                     </div>
                     <div class="cu026-modal__acciones">
-                        <a class="boton" href="${pageContext.request.contextPath}/" autofocus>Aceptar</a>
+                        <a class="boton" href="${pageContext.request.contextPath}/login?salir=1" autofocus>Aceptar</a>
                     </div>
                 </div>
             </div>
@@ -155,7 +155,7 @@
                         <c:if test="${fn:contains(mensaje, 'Ingrese con su clave') or fn:contains(mensaje, 'cancelada')}">
                             <a class="boton cu026-boton-oscuro" href="${pageContext.request.contextPath}/login?tipo=CANDIDATO">Ingresar con mi clave</a>
                         </c:if>
-                        <a class="boton" href="${pageContext.request.contextPath}/" autofocus>Aceptar</a>
+                        <a class="boton" href="${pageContext.request.contextPath}/login?salir=1" autofocus>Aceptar</a>
                     </div>
                 </div>
             </div>

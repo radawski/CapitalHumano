@@ -16,6 +16,10 @@
         <section class="panel">
             <form method="get" action="${pageContext.request.contextPath}/preguntas" id="form-busqueda-preguntas">
                 <input type="hidden" name="buscar" value="1">
+                <p class="cu020-sugerencia">
+                    <strong>* Sugerencia de uso:</strong> Utilice los filtros de Competencia y Factor para acotar la búsqueda.
+                    Presione el botón "Nuevo" para agregar una pregunta.
+                </p>
                 <div class="filtros-grid">
                     <div>
                         <label for="competencia">Competencia</label>
@@ -56,15 +60,10 @@
                     </div>
                 </div>
 
+                <%-- Como en el orden de mérito: Nuevo a la izquierda y Buscar, la acción principal, a la derecha --%>
                 <div class="cu020-barra-acciones">
-                    <div class="cu020-botones-principales">
-                        <a class="boton" href="${pageContext.request.contextPath}/preguntas/nueva" tabindex="5">Nuevo</a>
-                        <button type="submit" class="boton" tabindex="4">Buscar</button>
-                    </div>
-                    <p class="cu020-sugerencia">
-                        <strong>* Sugerencia de uso:</strong> Utilice los filtros de Competencia y Factor para acotar la búsqueda.
-                        Presione el botón "Nuevo" para agregar una pregunta.
-                    </p>
+                    <a class="boton" href="${pageContext.request.contextPath}/preguntas/nueva" tabindex="5">Nuevo</a>
+                    <button type="submit" class="boton" tabindex="4">Buscar</button>
                 </div>
             </form>
 
@@ -111,7 +110,7 @@
                                             <button type="button"
                                                     class="boton-icono boton-icono--deshabilitado"
                                                     disabled
-                                                    title="Modificar pregunta (CU022) está fuera del alcance"
+                                                    title="Modificar pregunta (no disponible)"
                                                     aria-label="Modificar pregunta (deshabilitado)">
                                                 &#9998; Modificar
                                             </button>
@@ -125,7 +124,7 @@
                                             </c:url>
                                             <a class="boton-icono boton-icono--eliminar"
                                                href="${urlEliminar}"
-                                               title="Eliminar pregunta (CU023)"
+                                               title="Eliminar pregunta"
                                                aria-label="Eliminar pregunta">
                                                 &#128465; Eliminar
                                             </a>

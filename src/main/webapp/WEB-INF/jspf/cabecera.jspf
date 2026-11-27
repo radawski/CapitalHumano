@@ -1,4 +1,5 @@
-<%-- Plantilla base: cabecera con el nombre de la consultora, el título de la pantalla y el usuario actual.
+<%-- Plantilla base: cabecera con el nombre de la consultora, el título de la pantalla y quién ingresó
+     (consultor o candidato, según CU001). El nombre lleva al menú principal solo para el consultor.
      Cada JSP define el título con <c:set var="titulo" value="..."/> (o el servlet con request.setAttribute)
      antes de incluir este fragmento. --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
@@ -14,7 +15,14 @@
 <header class="cabecera">
     <div class="cabecera__marca">
         <span class="cabecera__consultora">Consultora</span>
-        <a class="cabecera__nombre" href="${pageContext.request.contextPath}/">Capit@l Humano</a>
+        <c:choose>
+            <c:when test="${not empty sessionScope.usuario}">
+                <a class="cabecera__nombre" href="${pageContext.request.contextPath}/">Capit@l Humano</a>
+            </c:when>
+            <c:otherwise>
+                <span class="cabecera__nombre">Capit@l Humano</span>
+            </c:otherwise>
+        </c:choose>
     </div>
     <h1 class="cabecera__titulo"><c:out value="${titulo}"/></h1>
     <div class="cabecera__usuario">
@@ -24,9 +32,12 @@
                 Usuario: <c:out value="${sessionScope.usuario}"/>
                 &middot; <a style="color: inherit" href="${pageContext.request.contextPath}/login?salir=1">Salir</a>
             </c:when>
+            <c:when test="${not empty sessionScope.candidato}">
+                Candidato: <c:out value="${sessionScope.candidato}"/>
+                &middot; <a style="color: inherit" href="${pageContext.request.contextPath}/login?salir=1">Salir</a>
+            </c:when>
             <c:otherwise>
                 Usuario: [sin sesión]
-                &middot; <a style="color: inherit" href="${pageContext.request.contextPath}/login">Ingresar</a>
             </c:otherwise>
         </c:choose>
     </div>
