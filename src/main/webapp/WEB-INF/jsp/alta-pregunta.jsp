@@ -3,7 +3,7 @@
 
 <section class="panel">
     <form method="post" action="${pageContext.request.contextPath}/preguntas/nueva" id="form-alta-pregunta" novalidate>
-        <div class="filtros-grid">
+        <div class="filtros-grid filtros-grid--arriba">
             <div class="<c:if test='${camposConError.contains("competencia")}'>campo--error</c:if>">
                 <label for="competencia">Competencia <span class="error">*</span></label>
                 <select id="competencia" name="competencia" tabindex="1">

@@ -185,6 +185,10 @@ th { background: var(--azul); color: var(--blanco); font-weight: 600; }
     gap: 24px;
     align-items: start;
 }
+/* Campos con texto de ayuda debajo (contador): los rótulos quedan a la misma altura */
+.filtros-grid--arriba {
+    align-items: start;
+}
 @media (max-width: 900px) {
     .paneles-dobles { grid-template-columns: 1fr; }
 }
