@@ -9,18 +9,8 @@
         <div>
             <p class="panel__subtitulo">Gestión de Evaluaciones de Perfiles</p>
             <h2 class="inicio-titulo">Bienvenido a Capit@l Humano</h2>
-            <c:choose>
-                <c:when test="${not empty sessionScope.usuario}">
-                    <p class="inicio-texto">Sesión iniciada como <strong><c:out value="${sessionScope.usuario}"/></strong>. Elija una opción para comenzar.</p>
-                </c:when>
-                <c:otherwise>
-                    <p class="inicio-texto">Ingrese con su usuario de consultor para trabajar con el sistema, o con su clave si va a realizar un cuestionario.</p>
-                </c:otherwise>
-            </c:choose>
+            <p class="inicio-texto">Sesión iniciada como <strong><c:out value="${sessionScope.usuario}"/></strong>. Elija una opción para comenzar.</p>
         </div>
-        <c:if test="${empty sessionScope.usuario}">
-            <a class="boton" href="${ctx}/login">Ingresar</a>
-        </c:if>
     </section>
 
     <h2 class="inicio-seccion">Consultor</h2>
@@ -48,16 +38,6 @@
             <span class="inicio-tarjeta__titulo">Emitir orden de mérito</span>
             <span class="inicio-tarjeta__texto">Obtenga el ranking de candidatos evaluados para un puesto e imprímalo.</span>
             <span class="inicio-tarjeta__cu">CU028</span>
-        </a>
-    </div>
-
-    <h2 class="inicio-seccion">Candidato</h2>
-    <div class="inicio-grilla">
-        <a class="inicio-tarjeta" href="${ctx}/login?tipo=CANDIDATO">
-            <span class="inicio-tarjeta__icono" aria-hidden="true">&#128221;</span>
-            <span class="inicio-tarjeta__titulo">Realizar cuestionario</span>
-            <span class="inicio-tarjeta__texto">Ingrese con su documento y la clave que le asignó la consultora.</span>
-            <span class="inicio-tarjeta__cu">CU001 · CU026</span>
         </a>
     </div>
 
