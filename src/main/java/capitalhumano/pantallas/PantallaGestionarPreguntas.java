@@ -37,7 +37,6 @@ public class PantallaGestionarPreguntas extends HttpServlet {
     private static final int MAX_LEN_NOMBRE = 100;
     private static final int MAX_LEN_ENUNCIADO = 500;
     private static final int MAX_LEN_DESCRIPCION = 500;
-    private static final String USUARIO_POR_DEFECTO = "consultor";
     private static final String ATTR_FLASH_ELIMINADA = "cu023.preguntaEliminada";
     private static final String ATTR_FLASH_ERROR = "cu023.error";
     private static final String ATTR_FLASH_CREADA = "cu021.preguntaCreada";
@@ -522,7 +521,8 @@ public class PantallaGestionarPreguntas extends HttpServlet {
                 return usuario.toString().trim();
             }
         }
-        return USUARIO_POR_DEFECTO;
+        // No se inventa un consultor para la auditoría (CU023): FiltroAutenticacion no deja llegar sin sesión
+        throw new IllegalStateException("No hay un consultor autenticado en la sesión");
     }
 
     private static String construirUrlRetorno(HttpServletRequest request) {
