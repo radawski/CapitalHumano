@@ -457,16 +457,10 @@ th { background: var(--azul); color: var(--blanco); font-weight: 600; }
     margin-top: 16px;
     flex-wrap: wrap;
 }
-.cu020-botones-principales {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
 .cu020-sugerencia {
-    margin: 0;
+    margin: 0 0 16px;
     font-size: 0.85rem;
     color: var(--gris-texto);
-    max-width: 460px;
 }
 .cu020-alerta {
     margin-top: 16px;
