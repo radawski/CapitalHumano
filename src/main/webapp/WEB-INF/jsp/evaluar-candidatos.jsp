@@ -11,7 +11,6 @@
         </c:if>
 
         <section class="panel">
-            <p class="panel__subtitulo">CU025 · Pasos 7–8</p>
             <h2 class="panel__titulo">Selección del puesto vacante</h2>
             <p>Candidatos habilitados a evaluar:
                 <strong><c:out value="${sessionScope['cu025.candidatos'].size()}"/></strong>.</p>
@@ -67,7 +66,6 @@
         <c:choose>
             <c:when test="${not empty datosPuesto.competenciasNoEvaluables}">
                 <section class="panel">
-                    <p class="panel__subtitulo">CU025 · Flujo alternativo 9.A</p>
                     <h2 class="panel__titulo">No es posible evaluar el puesto seleccionado</h2>
                     <div class="alerta alerta--error" role="alert">
                         La función <strong><c:out value="${datosPuesto.puesto.nombre}"/></strong>
@@ -103,7 +101,6 @@
 
             <c:otherwise>
                 <section class="panel">
-                    <p class="panel__subtitulo">CU025 · Pasos 9–10</p>
                     <h2 class="panel__titulo">
                         Competencias evaluables — <c:out value="${datosPuesto.puesto.nombre}"/>
                         (<c:out value="${datosPuesto.puesto.empresa}"/>)
@@ -150,7 +147,6 @@
     <c:when test="${paso == 'claves'}">
         <c:set var="evalActual" value="${sessionScope['cu025.evaluacion']}"/>
         <section class="panel">
-            <p class="panel__subtitulo">CU025 · Pasos 11–13</p>
             <h2 class="panel__titulo">
                 Claves de ingreso generadas — <c:out value="${evalActual.puesto.nombre}"/>
             </h2>
@@ -192,7 +188,6 @@
     <c:when test="${paso == 'exportar'}">
         <c:set var="evalGuardada" value="${sessionScope['cu025.evaluacionGuardada']}"/>
         <section class="panel">
-            <p class="panel__subtitulo">CU025 · Pasos 14–18</p>
             <h2 class="panel__titulo">Evaluación guardada correctamente</h2>
             <div class="alerta alerta--exito">
                 La evaluación para <strong><c:out value="${evalGuardada.puesto.nombre}"/></strong>
@@ -231,7 +226,6 @@
         </c:if>
 
         <section class="panel">
-            <p class="panel__subtitulo">CU025 · Pasos 1–3</p>
             <h2 class="panel__titulo">Búsqueda de candidatos</h2>
             <form method="post" action="${pageContext.request.contextPath}/evaluar-candidatos">
                 <div class="filtros-grid">
@@ -262,7 +256,6 @@
 
         <div class="paneles-dobles">
             <section class="panel">
-                <p class="panel__subtitulo">Paso 4 · Selección</p>
                 <h2 class="panel__titulo">Resultados de búsqueda</h2>
                 <form method="post" action="${pageContext.request.contextPath}/evaluar-candidatos">
                     <c:choose>
@@ -310,7 +303,6 @@
             </section>
 
             <section class="panel">
-                <p class="panel__subtitulo">Pasos 5–6 · Lista para evaluar</p>
                 <h2 class="panel__titulo">Candidatos a evaluar</h2>
                 <form method="post" action="${pageContext.request.contextPath}/evaluar-candidatos">
                     <c:choose>

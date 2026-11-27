@@ -17,7 +17,6 @@
     <section class="panel orden-merito">
         <div class="orden-merito__encabezado">
             <div>
-                <p class="panel__subtitulo">CU028 · Pasos 7–10</p>
                 <h2 class="panel__titulo">Orden de mérito</h2>
                 <p>
                     <strong>Puesto:</strong> <c:out value="${orden.puestoCodigo}"/> – <c:out value="${orden.puestoNombre}"/>
@@ -150,7 +149,6 @@
 </c:if>
 
 <section class="panel">
-    <p class="panel__subtitulo">CU028 · Pasos 1–3</p>
     <h2 class="panel__titulo">Emitir orden de mérito</h2>
     <p>Ingresá al menos un criterio para buscar el puesto.</p>
 
@@ -188,7 +186,6 @@
 
 <c:if test="${sessionScope['cu028.busquedaRealizada']}">
     <section class="panel">
-        <p class="panel__subtitulo">CU028 · Paso 4</p>
         <h2 class="panel__titulo">Puestos encontrados</h2>
         <c:choose>
             <c:when test="${empty sessionScope['cu028.puestos']}">

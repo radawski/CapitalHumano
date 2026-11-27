@@ -111,7 +111,7 @@
                                             <button type="button"
                                                     class="boton-icono boton-icono--deshabilitado"
                                                     disabled
-                                                    title="Modificar pregunta (CU022) está fuera del alcance"
+                                                    title="Modificar pregunta (no disponible)"
                                                     aria-label="Modificar pregunta (deshabilitado)">
                                                 &#9998; Modificar
                                             </button>
@@ -125,7 +125,7 @@
                                             </c:url>
                                             <a class="boton-icono boton-icono--eliminar"
                                                href="${urlEliminar}"
-                                               title="Eliminar pregunta (CU023)"
+                                               title="Eliminar pregunta"
                                                aria-label="Eliminar pregunta">
                                                 &#128465; Eliminar
                                             </a>
