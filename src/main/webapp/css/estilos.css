@@ -33,18 +33,6 @@ body {
 .cabecera__titulo { margin: 0; font-size: 2.4rem; font-weight: 600; text-align: center; }
 .cabecera__usuario { justify-self: end; font-weight: 600; }
 
-/* Menú */
-.menu {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 20px;
-    padding: 8px 24px;
-    background: #eef1f5;
-    border-bottom: 1px solid #cfd6df;
-}
-.menu a { color: var(--azul); text-decoration: none; font-weight: 500; }
-.menu a:hover { text-decoration: underline; }
-
 .contenido { max-width: 1200px; margin: 32px auto; padding: 0 24px; }
 
 /* Paneles */
@@ -92,17 +80,136 @@ table { width: 100%; border-collapse: collapse; background: var(--blanco); }
 th, td { padding: 8px 12px; border-bottom: 1px solid #ddd; text-align: left; }
 th { background: var(--azul); color: var(--blanco); font-weight: 600; }
 
-/* Menú principal */
-.menu-principal { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
-.menu-principal a { color: var(--azul); font-weight: 600; }
-.menu-principal .fuera-de-alcance { color: #888; }
+/* Menú principal (index.jsp): bienvenida y tarjetas por actor */
+.inicio {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+.inicio-bienvenida {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px 24px;
+    flex-wrap: wrap;
+}
+.inicio-titulo {
+    margin: 2px 0 6px;
+    color: var(--azul);
+    font-size: 1.5rem;
+}
+.inicio-texto {
+    margin: 0;
+    color: #333;
+}
+.inicio-seccion {
+    margin: 28px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--azul);
+    color: var(--azul);
+    font-size: 1.15rem;
+}
+.inicio-grilla {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+}
+.inicio-tarjeta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px;
+    border: 1px solid #c6ccd4;
+    border-left: 5px solid var(--azul);
+    border-radius: 6px;
+    background: var(--gris-panel);
+    color: inherit;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.15s, transform 0.15s;
+}
+.inicio-tarjeta:hover,
+.inicio-tarjeta:focus-visible {
+    box-shadow: 0 6px 14px rgba(27, 54, 93, 0.25);
+    transform: translateY(-2px);
+    outline: none;
+}
+.inicio-tarjeta__icono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid var(--azul);
+    background: var(--blanco);
+    font-size: 1.2rem;
+}
+.inicio-tarjeta__titulo {
+    color: var(--azul);
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+.inicio-tarjeta__texto {
+    flex-grow: 1;
+    font-size: 0.9rem;
+    color: var(--gris-texto);
+}
+.inicio-tarjeta__cu {
+    align-self: flex-start;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--blanco);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--azul);
+}
+.inicio-fuera {
+    margin-top: 32px;
+    padding: 12px 20px;
+    border: 1px dashed #b5bcc6;
+    border-radius: 6px;
+    color: var(--gris-texto);
+}
+.inicio-fuera summary {
+    cursor: pointer;
+    font-weight: 600;
+}
+.inicio-fuera__nota {
+    margin: 10px 0;
+    font-size: 0.85rem;
+}
+.inicio-fuera__lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.inicio-fuera__lista a {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: #eef1f5;
+    color: #666;
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+.inicio-fuera__lista a:hover {
+    background: #e1e6ec;
+}
+.inicio-fuera__lista span {
+    margin-left: 4px;
+    font-size: 0.75rem;
+    color: #999;
+}
 
 .pie { text-align: center; padding: 16px; color: #888; font-size: 0.8rem; }
 
 /* Impresión: solo el contenido (lo usa CU028, #7) */
 @media print {
     @page { margin: 1.5cm; }
-    .menu, .pie, .no-imprimir, .boton, .alerta, .modal-fondo { display: none !important; }
+    .pie, .no-imprimir, .boton, .alerta, .modal-fondo { display: none !important; }
     .cabecera { background: none; color: #000; padding: 0 0 8px; }
     .cabecera__nombre { color: #000; }
     .panel { box-shadow: none; border: none; background: none; padding: 0; margin: 0; }

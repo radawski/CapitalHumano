@@ -31,11 +31,4 @@
         </c:choose>
     </div>
 </header>
-<nav class="menu">
-    <a href="${pageContext.request.contextPath}/">Menú principal</a>
-    <a href="${pageContext.request.contextPath}/preguntas">CU020 Gestionar preguntas</a>
-    <a href="${pageContext.request.contextPath}/evaluar-candidatos">CU025 Evaluar candidatos</a>
-    <a href="${pageContext.request.contextPath}/orden-merito">CU028 Orden de mérito</a>
-    <a href="${pageContext.request.contextPath}/login">CU001 Ingresar</a>
-</nav>
 <main class="contenido">
