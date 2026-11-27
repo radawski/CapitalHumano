@@ -4,6 +4,8 @@ La consultora “Capit@l Humano” es una consultora de recursos humanos de vang
 
 Implementación del **Sistema de Gestión de Evaluaciones de Perfiles**: TP de Diseño de Sistemas 2026, Grupo 26, Etapas 7 y 8. La fuente de verdad es la carpeta `Diseño Definitivo/` (clases, secuencias, DER y despliegue).
 
+Para el detalle completo de instalación, manual de uso por caso de uso, tabla de trazabilidad y checklist de entrega final, ver [docs/documentacion-sistema.md](docs/documentacion-sistema.md).
+
 ## Tecnología
 
 La fija el diagrama de despliegue:
