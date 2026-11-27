@@ -209,6 +209,184 @@ th { background: var(--azul); color: var(--blanco); font-weight: 600; }
     font-size: 1.25rem;
 }
 
+/* CU026: Completar cuestionario (insignia de estado, wizard de bloques y modales del mockup) */
+.cu026 {
+    max-width: 900px;
+    min-height: 60vh;
+    margin: 0 auto;
+}
+.cu026-barra-estado {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    color: var(--gris-texto);
+}
+.cu026-insignia {
+    display: inline-block;
+    padding: 4px 16px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--blanco);
+}
+.cu026-insignia--activo { background: #e0a800; color: #1f1f1f; }
+.cu026-insignia--en-proceso { background: #e8790c; }
+.cu026-insignia--completo { background: #1f7a3e; }
+.cu026-insignia--cerrado { background: var(--rojo); }
+.cu026-panel {
+    padding: 28px 36px;
+}
+.cu026-titulo {
+    margin: 0 0 16px;
+    color: #2f5fa8;
+    font-size: 1.3rem;
+}
+.cu026-instrucciones {
+    margin: 0 0 12px;
+    padding: 16px 20px;
+    background: var(--blanco);
+    border-radius: 4px;
+    line-height: 1.6;
+    white-space: pre-line;
+}
+.cu026-instrucciones-cierre {
+    margin: 0;
+    color: var(--gris-texto);
+}
+.cu026-bloque-encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    margin-bottom: 8px;
+}
+.cu026-bloque-encabezado .cu026-titulo {
+    margin-bottom: 0;
+}
+.cu026-bloque-nota {
+    font-size: 0.85rem;
+    color: var(--gris-texto);
+}
+.cu026-pregunta {
+    margin: 0 0 16px;
+    padding: 16px 20px;
+    border: 1px solid #c6ccd4;
+    border-radius: 6px;
+    background: var(--blanco);
+}
+.cu026-pregunta--error {
+    border-color: var(--rojo);
+    box-shadow: 0 0 0 1px var(--rojo);
+}
+.cu026-pregunta__error {
+    margin: 0 0 6px;
+    color: var(--rojo);
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+.cu026-pregunta__enunciado {
+    float: left;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 0;
+    font-weight: 700;
+    line-height: 1.4;
+}
+.cu026-pregunta__numero {
+    color: var(--azul);
+    margin-right: 4px;
+}
+.cu026-opciones {
+    clear: both;
+    display: grid;
+    gap: 6px;
+}
+.cu026-opcion {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 0;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.cu026-opcion:hover {
+    background: #eef1f5;
+}
+.cu026-opcion input {
+    margin: 3px 0 0;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    accent-color: var(--azul);
+}
+.cu026-opcion:has(input:checked) {
+    background: #e8eef6;
+}
+.cu026-acciones {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+.cu026-acciones--derecha {
+    justify-content: flex-end;
+}
+.cu026-acciones form {
+    margin: 0;
+}
+.cu026-boton-oscuro {
+    background: #2b2b2b;
+}
+.cu026-boton-oscuro:hover {
+    background: #444;
+}
+.cu026-modal {
+    max-width: 520px;
+    border-top: none;
+    border-left: 5px solid var(--azul);
+    text-align: center;
+}
+.cu026-modal__titulo {
+    margin: 0 0 16px;
+    color: #2f5fa8;
+    font-size: 1.3rem;
+}
+.cu026-modal__mensaje {
+    margin: 0 0 20px;
+    padding: 12px 16px;
+    border-left: 4px solid var(--azul);
+    background: #e8eef6;
+    text-align: left;
+}
+.cu026-modal__mensaje p {
+    margin: 4px 0;
+}
+.cu026-modal--error .cu026-modal__mensaje {
+    border-left-color: var(--rojo);
+    background: #fdecec;
+}
+.cu026-modal--exito .cu026-modal__mensaje {
+    border-left-color: #1f7a3e;
+    background: #eaf7ef;
+}
+.cu026-modal__acciones {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+@media (max-width: 640px) {
+    .cu026-panel { padding: 20px; }
+    .cu026-pregunta { padding: 12px 14px; }
+}
+
 /* CU020: Gestión de preguntas */
 .texto-mayusculas {
     text-transform: uppercase;
