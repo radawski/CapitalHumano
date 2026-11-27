@@ -121,7 +121,7 @@
             </div>
 
             <div class="cu001-acciones">
-                <a class="boton cu001-boton-oscuro" href="${pageContext.request.contextPath}/">Salir</a>
+                <a class="boton cu001-boton-oscuro" href="${pageContext.request.contextPath}/login?salir=1">Salir</a>
             </div>
         </section>
     </c:otherwise>

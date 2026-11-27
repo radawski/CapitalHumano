@@ -16,8 +16,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 /**
@@ -29,12 +27,17 @@ import java.util.Locale;
  *   <li>{@code GET /login?salir=1}: cierra la sesión.</li>
  * </ul>
  * El consultor queda en sesión con el atributo {@value #ATTR_USUARIO} (en minúscula, como lo guarda
- * la base y lo busca la auditoría); el candidato pasa directo a CU026 con su clave.
+ * la base y lo busca la auditoría). El candidato queda con {@value #ATTR_CANDIDATO} (su documento, para
+ * la cabecera) y con la clave validada en {@value #ATTR_CLAVE_PENDIENTE}, que CU026 consume una sola vez:
+ * la clave no viaja por la URL, así nadie entra al cuestionario sin pasar por el paso 3.A.2.
+ * {@link FiltroAutenticacion} usa esos atributos para decidir qué puede abrir cada uno.
  */
 @WebServlet(urlPatterns = {"/login"})
 public class PantallaAutenticar extends HttpServlet {
 
     static final String ATTR_USUARIO = "usuario";
+    static final String ATTR_CANDIDATO = "candidato";
+    static final String ATTR_CLAVE_PENDIENTE = "cu001.clavePendiente";
     static final String ERROR_CONSULTOR = "El usuario o la contraseña no son válidos";
     static final String ERROR_CANDIDATO =
             "Los datos ingresados no son válidos o no existe un cuestionario para el Candidato";
@@ -95,10 +98,12 @@ public class PantallaAutenticar extends HttpServlet {
         }
 
         if (resultado.isAutenticado()) {
-            // 3.A.3: pasa a CU026, que registra el acceso una sola vez
-            renovarSesion(request);
-            String clave = URLEncoder.encode(resultado.getClaveCuestionario(), StandardCharsets.UTF_8);
-            response.sendRedirect(request.getContextPath() + "/cuestionario?clave=" + clave);
+            // 3.A.3: sesión nueva del candidato y directo a CU026, que registra el acceso una sola vez
+            HttpSession session = renovarSesion(request);
+            session.setAttribute(ATTR_CANDIDATO,
+                    credenciales.getTipoDocumento() + " " + credenciales.getNroDocumento());
+            session.setAttribute(ATTR_CLAVE_PENDIENTE, resultado.getClaveCuestionario());
+            response.sendRedirect(request.getContextPath() + "/cuestionario");
         } else {
             // 3.A.2: se conserva el documento y se borra la clave
             request.setAttribute("error", ERROR_CANDIDATO);

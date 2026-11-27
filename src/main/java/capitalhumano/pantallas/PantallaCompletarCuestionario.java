@@ -54,12 +54,14 @@ public class PantallaCompletarCuestionario extends HttpServlet {
             return;
         }
 
-        // Ingreso: cada ingreso con clave cuenta un acceso, por eso se resuelve una sola vez
-        // y se redirige (un refresh no vuelve a llamar al gestor).
-        String clave = request.getParameter("clave");
-        if (clave != null && !clave.isBlank()) {
+        // iniciar(clave), invocado desde CU001 paso 3.A.3: la clave la deja el login en la sesión.
+        // Cada ingreso cuenta un acceso, por eso se consume una sola vez y se redirige
+        // (un refresh no vuelve a llamar al gestor).
+        HttpSession session = request.getSession(false);
+        String clave = session == null ? null : (String) session.getAttribute(PantallaAutenticar.ATTR_CLAVE_PENDIENTE);
+        if (clave != null) {
+            session.removeAttribute(PantallaAutenticar.ATTR_CLAVE_PENDIENTE);
             IngresoCuestionarioDTO ingreso = gestorCuestionarios.ingresarCuestionario(clave);
-            HttpSession session = request.getSession();
             session.removeAttribute(ATTR_BLOQUE);
             session.setAttribute(ATTR_INGRESO, ingreso);
             response.sendRedirect(request.getContextPath() + "/cuestionario");
