@@ -49,7 +49,7 @@
                 </c:choose>
 
                 <div class="acciones-barra">
-                    <div>
+                    <div class="botones-par">
                         <a class="boton boton--secundario" href="${pageContext.request.contextPath}/evaluar-candidatos">Volver a candidatos</a>
                         <button class="boton boton--secundario" type="submit" name="accion" value="cancelar">Cancelar</button>
                     </div>
@@ -133,7 +133,7 @@
                     </div>
 
                     <form method="post" action="${pageContext.request.contextPath}/evaluar-candidatos" class="acciones-barra">
-                        <div>
+                        <div class="botones-par">
                             <a class="boton boton--secundario" href="${pageContext.request.contextPath}/evaluar-candidatos/puesto">Cambiar puesto</a>
                             <button class="boton boton--secundario" type="submit" name="accion" value="cancelar">Cancelar</button>
                         </div>
@@ -200,7 +200,7 @@
                     <p>Confirmá la descarga del archivo Excel (<code>aaaa-mm-dd-hh-mm-NombreFunción.xls</code>);
                         el navegador te permitirá elegir dónde guardarlo.</p>
                     <form method="post" action="${pageContext.request.contextPath}/evaluar-candidatos" class="acciones-barra">
-                        <div>
+                        <div class="botones-par">
                             <a class="boton boton--secundario" href="${pageContext.request.contextPath}/evaluar-candidatos/exportar">Cancelar</a>
                             <button class="boton boton--secundario" type="submit" name="accion" value="cancelar">Salir al menú</button>
                         </div>

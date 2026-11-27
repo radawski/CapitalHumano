@@ -56,6 +56,12 @@ body {
     background: var(--azul);
     color: var(--blanco);
     font-size: 1.1rem;
+    /* <a> y <button> con la misma tipografía y altura: si no, el botón usa la fuente
+       del sistema y queda de otro tamaño al lado de un enlace con clase boton */
+    font-family: inherit;
+    line-height: 1.5;
+    vertical-align: middle;
+    text-align: center;
     text-decoration: none;
     cursor: pointer;
 }
@@ -179,14 +185,14 @@ th { background: var(--azul); color: var(--blanco); font-weight: 600; }
     gap: 16px;
     align-items: end;
 }
+/* Campos con texto de ayuda debajo (contador): los rótulos quedan a la misma altura */
+.filtros-grid--arriba {
+    align-items: start;
+}
 .paneles-dobles {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
-    align-items: start;
-}
-/* Campos con texto de ayuda debajo (contador): los rótulos quedan a la misma altura */
-.filtros-grid--arriba {
     align-items: start;
 }
 @media (max-width: 900px) {
@@ -202,6 +208,12 @@ th { background: var(--azul); color: var(--blanco); font-weight: 600; }
 }
 .acciones-barra--derecha {
     justify-content: flex-end;
+}
+/* Dos botones secundarios juntos (Volver/Cancelar, etc.): los dos con el ancho del más largo */
+.botones-par {
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
 }
 .boton--secundario {
     background: #5a6778;
