@@ -24,7 +24,8 @@ import java.util.Locale;
  *   <li>{@code GET /login}: el usuario elige el tipo de acceso (paso 1).</li>
  *   <li>{@code GET /login?tipo=CONSULTOR|CANDIDATO}: pide los datos de ese tipo de acceso (pasos 2 y 3.A.1).</li>
  *   <li>{@code POST /login}: autentica con la estrategia del tipo de acceso (pasos 3–5, 3.A.2, 5.A).</li>
- *   <li>{@code GET /login?salir=1}: cierra la sesión.</li>
+ *   <li>{@code GET /login?salir=1}: cierra la sesión y vuelve al paso 1 (Salir de la cabecera).</li>
+ *   <li>{@code GET /login?cerrar=1}: cierra la sesión y sale del sistema (Salir del paso 1).</li>
  * </ul>
  * El consultor queda en sesión con el atributo {@value #ATTR_USUARIO} (en minúscula, como lo guarda
  * la base y lo busca la auditoría). El candidato queda con {@value #ATTR_CANDIDATO} (su documento, para
@@ -57,11 +58,15 @@ public class PantallaAutenticar extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         if (request.getParameter("salir") != null) {
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-                session.invalidate();
-            }
+            cerrarSesion(request);
             response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        if (request.getParameter("cerrar") != null) {
+            // Salir desde la elección del tipo de acceso: fin del sistema, no se vuelve a pedir el ingreso
+            cerrarSesion(request);
+            request.setAttribute("finalizado", Boolean.TRUE);
+            mostrar(request, response, null);
             return;
         }
         mostrar(request, response, parsearTipoAcceso(request.getParameter("tipo")));
@@ -110,6 +115,13 @@ public class PantallaAutenticar extends HttpServlet {
             request.setAttribute("tipoDocumento", credenciales.getTipoDocumento());
             request.setAttribute("nroDocumento", credenciales.getNroDocumento());
             mostrar(request, response, TipoAcceso.CANDIDATO);
+        }
+    }
+
+    private static void cerrarSesion(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
         }
     }
 

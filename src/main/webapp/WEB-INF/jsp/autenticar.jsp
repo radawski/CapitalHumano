@@ -4,6 +4,18 @@
 
 <div class="cu001">
 <c:choose>
+    <c:when test="${finalizado}">
+        <%-- Salir desde el paso 1: se cerró la sesión y se sale del sistema --%>
+        <section class="panel cu001-tarjeta">
+            <p class="panel__subtitulo">Capit@l Humano</p>
+            <h2 class="cu001-titulo">Salió del sistema</h2>
+            <p>La sesión quedó cerrada. Ya puede cerrar esta ventana del navegador.</p>
+            <div class="cu001-acciones">
+                <a class="boton" href="${pageContext.request.contextPath}/login">Volver a ingresar</a>
+            </div>
+        </section>
+    </c:when>
+
     <c:when test="${tipoAcceso == 'CONSULTOR'}">
         <%-- Pasos 2 a 5: ingreso del consultor --%>
         <section class="panel cu001-tarjeta">
@@ -121,7 +133,9 @@
             </div>
 
             <div class="cu001-acciones">
-                <a class="boton cu001-boton-oscuro" href="${pageContext.request.contextPath}/login?salir=1">Salir</a>
+                <%-- Intenta cerrar la ventana; si el navegador no lo permite, muestra la salida del sistema --%>
+                <a class="boton cu001-boton-oscuro" href="${pageContext.request.contextPath}/login?cerrar=1"
+                   onclick="window.close()">Salir</a>
             </div>
         </section>
     </c:otherwise>
