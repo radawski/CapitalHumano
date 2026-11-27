@@ -18,42 +18,19 @@
         <a class="inicio-tarjeta" href="${ctx}/preguntas">
             <span class="inicio-tarjeta__icono" aria-hidden="true">&#10067;</span>
             <span class="inicio-tarjeta__titulo">Gestionar preguntas</span>
-            <span class="inicio-tarjeta__texto">Busque preguntas por competencia y factor, y modifíquelas o délas de baja.</span>
-            <span class="inicio-tarjeta__cu">CU020 · CU023</span>
-        </a>
-        <a class="inicio-tarjeta" href="${ctx}/preguntas/nueva">
-            <span class="inicio-tarjeta__icono" aria-hidden="true">&#10133;</span>
-            <span class="inicio-tarjeta__titulo">Dar de alta pregunta</span>
-            <span class="inicio-tarjeta__texto">Cargue una pregunta nueva con su opción de respuesta y ponderaciones.</span>
-            <span class="inicio-tarjeta__cu">CU021</span>
+            <span class="inicio-tarjeta__texto">Busque preguntas por competencia y factor, cargue preguntas nuevas o délas de baja.</span>
         </a>
         <a class="inicio-tarjeta" href="${ctx}/evaluar-candidatos">
             <span class="inicio-tarjeta__icono" aria-hidden="true">&#128101;</span>
             <span class="inicio-tarjeta__titulo">Evaluar a candidatos</span>
             <span class="inicio-tarjeta__texto">Asigne un puesto a los candidatos y genere sus claves de cuestionario.</span>
-            <span class="inicio-tarjeta__cu">CU025</span>
         </a>
         <a class="inicio-tarjeta" href="${ctx}/orden-merito">
             <span class="inicio-tarjeta__icono" aria-hidden="true">&#127942;</span>
             <span class="inicio-tarjeta__titulo">Emitir orden de mérito</span>
             <span class="inicio-tarjeta__texto">Obtenga el ranking de candidatos evaluados para un puesto e imprímalo.</span>
-            <span class="inicio-tarjeta__cu">CU028</span>
         </a>
     </div>
-
-    <details class="inicio-fuera">
-        <summary>Funciones fuera del alcance de la entrega final</summary>
-        <p class="inicio-fuera__nota">Tienen clase en el diseño, pero no se implementan en esta entrega.</p>
-        <ul class="inicio-fuera__lista">
-            <li><a href="${ctx}/importar-candidatos">Importar candidatos <span>CU006</span></a></li>
-            <li><a href="${ctx}/exportar-resultados">Exportar resultados <span>CU007</span></a></li>
-            <li><a href="${ctx}/puestos">Gestionar puestos <span>CU008</span></a></li>
-            <li><a href="${ctx}/competencias">Gestionar competencias</a></li>
-            <li><a href="${ctx}/factores">Gestionar factores</a></li>
-            <li><a href="${ctx}/opciones-respuesta">Gestionar opciones de respuesta</a></li>
-            <li><a href="${ctx}/reporte-comparativo">Reporte comparativo <span>CU027</span></a></li>
-        </ul>
-    </details>
 </div>
 
 <%@ include file="/WEB-INF/jspf/pie.jspf" %>
