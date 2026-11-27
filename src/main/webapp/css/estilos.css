@@ -510,3 +510,120 @@ input[type="number"] {
 .puntaje--no-aprobado {
     color: var(--rojo);
 }
+
+/* CU001: Ingreso al sistema (tarjeta centrada con el estilo de los mockups) */
+.cu001 {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0 24px;
+}
+.cu001-tarjeta {
+    width: 100%;
+    max-width: 560px;
+    padding: 28px 36px;
+}
+.cu001-tarjeta--ancha {
+    max-width: 760px;
+}
+.cu001-encabezado {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+.cu001-titulo {
+    margin: 2px 0 0;
+    color: var(--azul);
+    font-size: 1.4rem;
+}
+.cu001-tarjeta--ancha .cu001-titulo {
+    margin-bottom: 20px;
+}
+.cu001-icono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--blanco);
+    border: 2px solid var(--azul);
+    font-size: 1.4rem;
+}
+.cu001-campos {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+.cu001-campos--documento {
+    grid-template-columns: minmax(120px, 1fr) 2fr;
+}
+.cu001-campos label {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.cu001-obligatorio {
+    color: var(--rojo);
+}
+.cu001-nota {
+    margin: 0 0 4px;
+    font-size: 0.8rem;
+    color: var(--gris-texto);
+}
+.cu001-acciones {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+.cu001-boton-oscuro {
+    background: #2b2b2b;
+}
+.cu001-boton-oscuro:hover {
+    background: #444;
+}
+.cu001-opciones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+.cu001-opcion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 24px 20px;
+    border-radius: 6px;
+    background: var(--blanco);
+    border: 1px solid #c6ccd4;
+    text-align: center;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.cu001-opcion:hover,
+.cu001-opcion:focus-visible {
+    border-color: var(--azul);
+    box-shadow: 0 4px 12px rgba(27, 54, 93, 0.2);
+    outline: none;
+}
+.cu001-opcion__titulo {
+    color: var(--azul);
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+.cu001-opcion__texto {
+    flex-grow: 1;
+    font-size: 0.9rem;
+    color: var(--gris-texto);
+}
+@media (max-width: 640px) {
+    .cu001-tarjeta { padding: 20px; }
+    .cu001-opciones,
+    .cu001-campos--documento { grid-template-columns: 1fr; }
+}
+.cu001 input::placeholder {
+    text-transform: none;
+}
