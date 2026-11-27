@@ -2,93 +2,130 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ include file="/WEB-INF/jspf/cabecera.jspf" %>
 
-<c:if test="${not empty error}">
-    <div class="alerta alerta--error" role="alert">
-        <c:out value="${error}"/>
-    </div>
-</c:if>
-
+<div class="cu001">
 <c:choose>
     <c:when test="${tipoAcceso == 'CONSULTOR'}">
-        <section class="panel">
-            <p class="panel__subtitulo">CU001 · Ingresar como usuario consultor</p>
-            <h2 class="panel__titulo">Ingreso del consultor</h2>
+        <%-- Pasos 2 a 5: ingreso del consultor --%>
+        <section class="panel cu001-tarjeta">
+            <div class="cu001-encabezado">
+                <span class="cu001-icono" aria-hidden="true">&#128188;</span>
+                <div>
+                    <p class="panel__subtitulo">Ingresar como usuario consultor</p>
+                    <h2 class="cu001-titulo">Ingreso del consultor</h2>
+                </div>
+            </div>
+
+            <c:if test="${not empty error}">
+                <div class="alerta alerta--error" role="alert">
+                    <c:out value="${error}"/>
+                </div>
+            </c:if>
+
             <form method="post" action="${pageContext.request.contextPath}/login" autocomplete="off">
                 <input type="hidden" name="tipo" value="CONSULTOR">
-                <div class="filtros-grid">
+                <div class="cu001-campos">
                     <div>
-                        <label for="usuario">Usuario</label>
+                        <label for="usuario">Usuario <span class="cu001-obligatorio">*</span></label>
                         <input id="usuario" name="usuario" type="text" maxlength="15" required autofocus
+                               placeholder="Ingrese su usuario" tabindex="1"
                                style="text-transform: uppercase"
                                oninput="this.value = this.value.toUpperCase()">
                     </div>
                     <div>
-                        <label for="password">Contraseña</label>
-                        <input id="password" name="password" type="password" maxlength="20" required>
+                        <label for="password">Contraseña <span class="cu001-obligatorio">*</span></label>
+                        <input id="password" name="password" type="password" maxlength="20" required
+                               placeholder="Ingrese su contraseña" tabindex="2">
                     </div>
                 </div>
-                <div class="acciones-barra">
-                    <div>
-                        <a class="boton boton--secundario" href="${pageContext.request.contextPath}/login">Cambiar tipo de acceso</a>
-                        <a class="boton boton--secundario" href="${pageContext.request.contextPath}/">Salir</a>
-                    </div>
-                    <button class="boton" type="submit">Ingresar</button>
+                <p class="cu001-nota">* Campos obligatorios</p>
+                <div class="cu001-acciones">
+                    <a class="boton cu001-boton-oscuro" href="${pageContext.request.contextPath}/login" tabindex="4">Volver</a>
+                    <button class="boton" type="submit" tabindex="3">Ingresar</button>
                 </div>
             </form>
         </section>
     </c:when>
 
     <c:when test="${tipoAcceso == 'CANDIDATO'}">
-        <section class="panel">
-            <p class="panel__subtitulo">CU001 · Realizar cuestionario</p>
-            <h2 class="panel__titulo">Ingreso del candidato</h2>
+        <%-- Pasos 3.A.1 a 3.A.3: ingreso del candidato --%>
+        <section class="panel cu001-tarjeta">
+            <div class="cu001-encabezado">
+                <span class="cu001-icono" aria-hidden="true">&#128221;</span>
+                <div>
+                    <p class="panel__subtitulo">Realizar cuestionario</p>
+                    <h2 class="cu001-titulo">Ingreso del candidato</h2>
+                </div>
+            </div>
+
+            <c:if test="${not empty error}">
+                <div class="alerta alerta--error" role="alert">
+                    <c:out value="${error}"/>
+                </div>
+            </c:if>
+
             <form method="post" action="${pageContext.request.contextPath}/login" autocomplete="off">
                 <input type="hidden" name="tipo" value="CANDIDATO">
-                <div class="filtros-grid">
+                <div class="cu001-campos cu001-campos--documento">
                     <div>
-                        <label for="tipoDocumento">Tipo de documento</label>
-                        <select id="tipoDocumento" name="tipoDocumento" required>
+                        <label for="tipoDocumento">Tipo de documento <span class="cu001-obligatorio">*</span></label>
+                        <select id="tipoDocumento" name="tipoDocumento" required tabindex="1">
                             <c:forEach var="t" items="${tiposDocumento}">
                                 <option value="${t}" <c:if test="${t == tipoDocumento}">selected</c:if>>${t}</option>
                             </c:forEach>
                         </select>
                     </div>
                     <div>
-                        <label for="nroDocumento">Número de documento</label>
+                        <label for="nroDocumento">Número de documento <span class="cu001-obligatorio">*</span></label>
                         <input id="nroDocumento" name="nroDocumento" type="text" maxlength="20" required autofocus
+                               placeholder="Ingrese su número de documento" tabindex="2"
                                value="<c:out value='${nroDocumento}'/>">
                     </div>
+                </div>
+                <div class="cu001-campos">
                     <div>
-                        <label for="clave">Clave</label>
+                        <label for="clave">Clave de ingreso <span class="cu001-obligatorio">*</span></label>
                         <input id="clave" name="clave" type="password" maxlength="20" required
+                               placeholder="Ingrese su clave" tabindex="3"
                                style="text-transform: uppercase"
                                oninput="this.value = this.value.toUpperCase()">
                     </div>
                 </div>
-                <div class="acciones-barra">
-                    <div>
-                        <a class="boton boton--secundario" href="${pageContext.request.contextPath}/login">Cambiar tipo de acceso</a>
-                        <a class="boton boton--secundario" href="${pageContext.request.contextPath}/">Salir</a>
-                    </div>
-                    <button class="boton" type="submit">Ingresar</button>
+                <p class="cu001-nota">* Campos obligatorios</p>
+                <div class="cu001-acciones">
+                    <a class="boton cu001-boton-oscuro" href="${pageContext.request.contextPath}/login" tabindex="5">Volver</a>
+                    <button class="boton" type="submit" tabindex="4">Ingresar</button>
                 </div>
             </form>
         </section>
     </c:when>
 
     <c:otherwise>
-        <section class="panel">
-            <p class="panel__subtitulo">CU001 · Paso 1</p>
-            <h2 class="panel__titulo">Seleccione el tipo de acceso</h2>
-            <div class="acciones-barra">
-                <div>
-                    <a class="boton" href="${pageContext.request.contextPath}/login?tipo=CONSULTOR">Ingresar como usuario consultor</a>
-                    <a class="boton" href="${pageContext.request.contextPath}/login?tipo=CANDIDATO">Realizar cuestionario</a>
-                </div>
-                <a class="boton boton--secundario" href="${pageContext.request.contextPath}/">Salir</a>
+        <%-- Paso 1: selección del tipo de acceso --%>
+        <section class="panel cu001-tarjeta cu001-tarjeta--ancha">
+            <p class="panel__subtitulo">Bienvenido a Capit@l Humano</p>
+            <h2 class="cu001-titulo">Seleccione el tipo de acceso</h2>
+
+            <div class="cu001-opciones">
+                <a class="cu001-opcion" href="${pageContext.request.contextPath}/login?tipo=CONSULTOR">
+                    <span class="cu001-icono" aria-hidden="true">&#128188;</span>
+                    <span class="cu001-opcion__titulo">Ingresar como usuario consultor</span>
+                    <span class="cu001-opcion__texto">Gestione preguntas, evalúe candidatos y emita reportes.</span>
+                    <span class="boton">Ingresar</span>
+                </a>
+                <a class="cu001-opcion" href="${pageContext.request.contextPath}/login?tipo=CANDIDATO">
+                    <span class="cu001-icono" aria-hidden="true">&#128221;</span>
+                    <span class="cu001-opcion__titulo">Realizar cuestionario</span>
+                    <span class="cu001-opcion__texto">Ingrese con su documento y la clave que le asignó la consultora.</span>
+                    <span class="boton">Comenzar</span>
+                </a>
+            </div>
+
+            <div class="cu001-acciones">
+                <a class="boton cu001-boton-oscuro" href="${pageContext.request.contextPath}/">Salir</a>
             </div>
         </section>
     </c:otherwise>
 </c:choose>
+</div>
 
 <%@ include file="/WEB-INF/jspf/pie.jspf" %>
